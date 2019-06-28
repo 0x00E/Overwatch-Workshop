@@ -1,0 +1,17 @@
+actions
+{
+	Create In-World Text(All Players(All Teams),
+    String
+    (
+        "{0} - {1} - {2}", 
+        Hero Icon String(Hero Of(Event Player)), 
+        Health(Event Player), 
+        Add(Slot Of(Event Player), Multiply(Number of Players(Team 1), Compare(Team Of(Event Player), ==, Team 1)))
+    ),
+		Event Player, 3, Clip Against Surfaces, Visible To Position and String);
+}
+
+actions
+{
+	Modify Global Variable(A, Add, Add(Slot Of(Event Player), Multiply(Number of Players(Team 1), Compare(Team Of(Event Player), ==, Team 1))));
+}

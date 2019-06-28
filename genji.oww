@@ -1,0 +1,159 @@
+rule("全局")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Match Time(-10000.000);
+		Pause Match Time;
+	}
+}
+
+rule("玩家")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, Multiply(9999999.000, 9999999.000));
+		Set Status(Event Player, Null, Unkillable, 9999);
+		Set Damage Dealt(Event Player, Multiply(9999999.000, 9999999.000));
+		Start Heal Over Time(Event Player, Event Player, Multiply(9999999.000, 9999999.000), Multiply(9999999.000, 9999999.000));
+	}
+}
+
+rule("ANA")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Ana;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Create Icon(All Players(All Teams), Event Player, Plus, Visible To and Position, Green, True);
+		Set Global Variable(A, Event Player);
+	}
+}
+
+rule("重生")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Attacker != Victim;
+	}
+
+	actions
+	{
+		Resurrect(Event Player);
+		Teleport(Event Player, World Vector Of(Vector(0, 0, 0), Event Player, Rotation And Translation));
+	}
+}
+
+rule("AI")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, Multiply(9999999.000, 9999999.000));
+		Create Icon(All Players(All Teams), Event Player, Skull, Visible To and Position, White, True);
+		Heal(Event Player, All Players(All Teams), Multiply(9999999.000, 9999999.000));
+		Start Heal Over Time(Event Player, Event Player, Multiply(9999999.000, 9999999.000), Multiply(9999999.000, 9999999.000));
+	}
+}
+
+rule("非安娜玩家")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Ana);
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Teleport(Global Variable(A), Event Player);
+	}
+}
+
+rule("异常重生")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Attacker == Victim;
+	}
+
+	actions
+	{
+		Respawn(Event Player);
+	}
+}
+
+rule("")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Slot 0;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Crouch) == True;
+		Is Communicating Any Emote(Event Player) == True;
+		Is Communicating Any Voice line(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(All Players(Team 2), Event Player);
+	}
+}
