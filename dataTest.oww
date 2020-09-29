@@ -1,0 +1,263 @@
+rule("数据测试 By：浅念#51206")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Music;
+		Set Global Variable(A, Vector(192.810, 12.499, -46.329));
+		Set Global Variable(B, Right);
+	}
+}
+
+rule("所有玩家")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), String("{0} - {1} - {2}", Hero Icon String(Hero Of(Event Player)), Health(
+			Event Player), Team Of(Event Player)), Event Player, 1.500, Clip Against Surfaces, Visible To Position and String, White,
+			Default Visibility);
+	}
+}
+
+rule("电脑队友")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Global Variable(A));
+		Set Facing(Event Player, Global Variable(B), To World);
+		Set Status(Event Player, Null, Unkillable, 9999);
+	}
+}
+
+rule("除了堡垒和用户的电脑")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+		Event Player != Host Player;
+		Hero Of(Event Player) != Hero(Bastion);
+	}
+
+	actions
+	{
+		Set Aim Speed(Event Player, 10);
+		Set Move Speed(Event Player, 0);
+		Set Projectile Speed(Event Player, 0);
+		Set Global Variable(Z, 0);
+		Modify Global Variable(Z, Add, Add(Slot Of(Event Player), Multiply(Number of Players(Team 1), Compare(Team Of(Event Player), ==,
+			Team 1))));
+		Teleport(Event Player, Vector(Add(178, Multiply(1.500, Global Variable(Z))), 12.499, -47.043));
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ultimate Ability Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Set Status(Event Player, Null, Stunned, 9999);
+		disabled Set Healing Received(Event Player, 0);
+		disabled Set Healing Dealt(Event Player, 0);
+	}
+}
+
+rule("玩家死亡原地复活")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Resurrect(Event Player);
+	}
+}
+
+rule("Ctrl+Q切换英雄")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Ultimate) == True;
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+		Set Global Variable(A, Position Of(Event Player));
+		Set Global Variable(B, Facing Direction Of(Event Player));
+		Set Player Allowed Heroes(Event Player, Remove From Array(All Heroes, Hero Of(Event Player)));
+		Wait(0.250, Ignore Condition);
+		Set Player Allowed Heroes(Event Player, All Heroes);
+	}
+}
+
+rule("Ctrl+F对队友造成伤害")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Crouch) == True;
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Damage(All Players(Team 1), Null, 10000);
+	}
+}
+
+rule("堡垒")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Bastion;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(158.763, 12.664, -28.255));
+		Set Facing(Event Player, Up, To World);
+		Press Button(Event Player, Ability 1);
+		Wait(0.250, Ignore Condition);
+		Disallow Button(Event Player, Ability 1);
+		Disallow Button(Event Player, Ability 2);
+		Disallow Button(Event Player, Secondary Fire);
+		Set Status(Event Player, Null, Unkillable, 9999);
+		Disallow Button(Event Player, Ultimate);
+		Set Global Variable(C, Event Player);
+	}
+}
+
+rule("Ctrl+E关闭堡垒主武器")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Crouch) == True;
+		Is Button Held(Event Player, Ability 2) == True;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Global Variable(C), False);
+	}
+}
+
+rule("Ctrl+Shift开启堡垒主武器")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Crouch) == True;
+		Is Button Held(Event Player, Ability 1) == True;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Global Variable(C), True);
+		Press Button(Global Variable(C), Primary Fire);
+	}
+}
+
+rule("对堡垒隐身")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Event Player != Host Player;
+	}
+
+	actions
+	{
+		Set Invisible(Event Player, Enemies);
+	}
+}
+
+rule("手动结束游戏")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Communicating Any Voice line(Event Player) == True;
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Declare Team Victory(Team 1);
+	}
+}

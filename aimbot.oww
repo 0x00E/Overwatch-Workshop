@@ -1,0 +1,1129 @@
+rule("//欢迎关注bilibili亚洲图片，有问题可以在B站找到我。")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("//超级瞄准由亚洲图片制作，繁华提供技术指导与技术支持。")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+disabled rule("//请不要删除或者修改名字")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//欢迎关注bilibli直播间1149")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == False;
+		disabled Is Button Held(Event Player, Secondary Fire) == False;
+		Player Variable(Event Player, A) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+		Set Player Variable(Event Player, B, 0);
+	}
+}
+
+rule("//自瞄")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, Q) == False;
+		Player Variable(Event Player, W) == False;
+	}
+
+	actions
+	{
+		Skip If(Compare(Is In Line of Sight(Event Player, Player Closest To Reticle(Event Player, Opposite Team Of(Team Of(Event Player))),
+			Barriers Do Not Block LOS), ==, False), 1);
+		Set Player Variable(Event Player, B, Player Closest To Reticle(Event Player, Opposite Team Of(Team Of(Event Player))));
+		Skip If(And(Compare(Player Variable(Event Player, B), !=, Event Player), And(Compare(Player Variable(Event Player, B), !=, 0),
+			Is Alive(Player Variable(Event Player, B)))), 1);
+		Set Player Variable(Event Player, B, First Of(Sorted Array(Filtered Array(All Living Players(Opposite Team Of(Team Of(
+			Event Player))), Is In Line of Sight(Event Player, Current Array Element, Barriers Do Not Block LOS)), Distance Between(
+			Current Array Element, Event Player))));
+		Skip If(Or(Compare(Player Variable(Event Player, B), ==, Event Player), Compare(Player Variable(Event Player, B), ==, 0)), 1);
+		Start Facing(Event Player, Vector Towards(Eye Position(Event Player), Add(Eye Position(Player Variable(Event Player, B)), Add(
+			Multiply(World Vector Of(Up, Player Variable(Event Player, B), Rotation), 0.020), World Vector Of(Vector(Divide(Divide(
+			Speed Of In Direction(Player Variable(Event Player, B), World Vector Of(Left, Event Player, Rotation)), 32), 1), 0, 0),
+			Event Player, Rotation)))), Absolute Value(9999999.000), To World, Direction and Turn Rate);
+		Skip If(And(Compare(Player Variable(Event Player, B), !=, Event Player), And(Compare(Player Variable(Event Player, B), !=, 0),
+			Is Alive(Player Variable(Event Player, B)))), 1);
+		Stop Facing(Event Player);
+		Wait(0.233, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("// 当你的对手黑影隐身的时候")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Sombra), Opposite Team Of(Team Of(Event Player))) == True;
+		Is Using Ability 1(Players On Hero(Hero(Sombra), Opposite Team Of(Team Of(Event Player)))) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, Y, True);
+	}
+}
+
+rule("// 当你的对手黑影还没隐身的时候")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Sombra), Opposite Team Of(Team Of(Event Player))) == True;
+		Is Using Ability 1(Players On Hero(Hero(Sombra), Opposite Team Of(Team Of(Event Player)))) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, Y, False);
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//当你得对手黑影的时候")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, Y) == True;
+		Player Variable(Event Player, Q) == False;
+		Player Variable(Event Player, W) == False;
+		Hero Of(Value In Array(Player Variable(Event Player, B), 0)) == Hero(Sombra);
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("// 当你的对手破坏球还变身的时候")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Wrecking Ball), Opposite Team Of(Team Of(Event Player))) == True;
+		Is Using Ability 1(Players On Hero(Hero(Wrecking Ball), Opposite Team Of(Team Of(Event Player)))) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, Z, True);
+	}
+}
+
+rule("// 当你的对手破坏球还没有变身的时候")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Wrecking Ball), Opposite Team Of(Team Of(Event Player))) == True;
+		Is Using Ability 1(Players On Hero(Hero(Wrecking Ball), Opposite Team Of(Team Of(Event Player)))) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, Z, False);
+	}
+}
+
+rule("//当你得对手是破坏球的时候")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, Z) == True;
+		Player Variable(Event Player, Q) == False;
+		Player Variable(Event Player, W) == False;
+		Hero Of(Value In Array(Player Variable(Event Player, B), 0)) == Hero(Wrecking Ball);
+	}
+
+	actions
+	{
+		Skip If(Compare(Is In Line of Sight(Event Player, Player Closest To Reticle(Event Player, Opposite Team Of(Team Of(Event Player))),
+			Barriers Do Not Block LOS), ==, False), 1);
+		Set Player Variable(Event Player, B, Player Closest To Reticle(Event Player, Opposite Team Of(Team Of(Event Player))));
+		Skip If(And(Compare(Player Variable(Event Player, B), !=, Event Player), And(Compare(Player Variable(Event Player, B), !=, 0),
+			Is Alive(Player Variable(Event Player, B)))), 1);
+		Set Player Variable(Event Player, B, First Of(Sorted Array(Filtered Array(All Living Players(Opposite Team Of(Team Of(
+			Event Player))), Is In Line of Sight(Event Player, Current Array Element, Barriers Do Not Block LOS)), Distance Between(
+			Current Array Element, Event Player))));
+		Skip If(Or(Compare(Player Variable(Event Player, B), ==, Event Player), Compare(Player Variable(Event Player, B), ==, 0)), 1);
+		Start Facing(Event Player, Vector Towards(Eye Position(Event Player), Add(Eye Position(Player Variable(Event Player, B)), Add(
+			Multiply(World Vector Of(Up, Player Variable(Event Player, B), Rotation), 0.020), World Vector Of(Vector(Divide(Divide(
+			Speed Of In Direction(Player Variable(Event Player, B), World Vector Of(Left, Event Player, Rotation)), 32), 1), -1.000, 0),
+			Event Player, Rotation)))), Absolute Value(9999999.000), To World, Direction and Turn Rate);
+		Skip If(And(Compare(Player Variable(Event Player, B), !=, Event Player), And(Compare(Player Variable(Event Player, B), !=, 0),
+			Is Alive(Player Variable(Event Player, B)))), 1);
+		Stop Facing(Event Player);
+		Wait(0.233, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("//瞄准睡觉的敌人不会开启自瞄。其他敌人不影响。")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, Q) == False;
+		Has Status(Player Variable(Event Player, B), Asleep) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, W, True);
+		Stop Facing(Event Player);
+	}
+}
+
+rule("//睡醒了之后不用松开左键自动瞄准。")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Status(Player Variable(Event Player, B), Asleep) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, W, False);
+	}
+}
+
+rule("//瞄准击倒的敌人不会开启自瞄。其他敌人不影响。")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, Q) == False;
+		Has Status(Player Variable(Event Player, B), Knocked Down) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, W, True);
+		Stop Facing(Event Player);
+	}
+}
+
+rule("//击倒起身之后不用松开左键自动瞄准。")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Status(Player Variable(Event Player, B), Knocked Down) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, W, False);
+	}
+}
+
+rule("//在自瞄房，用延迟弹道的安娜也就算了。完事你还能用不是自瞄的shift睡人。NB")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ana;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, F, True);
+	}
+}
+
+rule("//睡了人之后，你他喵还要去杀人。完事问我安娜睡人咋不能自瞄了，你咋不上天！为了这个我头发少了半斤!")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ana;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Ability 1) == True;
+		Player Variable(Event Player, F) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Up, 50, To Player, Cancel Contrary Motion);
+		Apply Impulse(Event Player, Forward, 50, To Player, Cancel Contrary Motion);
+		Set Player Variable(Event Player, F, False);
+	}
+}
+
+disabled rule("//按住互动取消自瞄")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, Q, True);
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//按住互动取消自瞄")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		disabled Is Button Held(Event Player, Interact) == False;
+		disabled Player Variable(Event Player, Q) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, Q, False);
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//D.va")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		D.Va;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//d.va")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		D.Va;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//半藏")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Hanzo;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//半藏")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Hanzo;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//dj")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//dj")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//堡垒")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//堡垒")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//天使")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//天使")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//奥丽莎")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//奥丽莎")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//锁血怪")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//锁血怪")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//瑞破")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//瑞破")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//法鸡")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//法鸡")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//猩猩")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//猩猩")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//狂鼠")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//狂鼠")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//猎空")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Tracer;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//猎空")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Tracer;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//仓鼠")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//仓鼠")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//大锤右键键不锁")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//大锤左键不锁")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//莫伊拉")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Moira;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, A, False);
+	}
+}
+
+rule("//莫伊拉")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Moira;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, True);
+	}
+}
+
+rule("//大锤的补偿加血")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Reinhardt), Team Of(Event Player)) == True;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, 100.002);
+	}
+}
+
+rule("//猩猩的补偿加血")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Winston), Team Of(Event Player)) == True;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, 100.002);
+	}
+}
+
+rule("//狂鼠的补偿加血10")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Junkrat), Team Of(Event Player)) == True;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, 105);
+	}
+}
+
+rule("//其他玩家不加血。")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Junkrat), Team Of(Event Player)) == False;
+		Is Hero Being Played(Hero(Winston), Team Of(Event Player)) == False;
+		Is Hero Being Played(Hero(Reinhardt), Team Of(Event Player)) == False;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, 100);
+	}
+}

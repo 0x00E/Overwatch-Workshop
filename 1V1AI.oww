@@ -1,0 +1,115 @@
+rule("Rule 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(All Heroes, Team 2, -1.000, Position Of(Event Player), Vector(0, 0, 0));
+		Set Global Variable(A, Event Player);
+	}
+}
+
+rule("Rule 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+		Has Spawned(Global Variable(A)) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Global Variable(A));
+	}
+}
+
+rule("Rule 3")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Subtract(Position Of(Event Player), Vector(
+			Random Integer(-2.000, 2), 0, Random Integer(-2.000, 2)))), 1, To World, Replace existing throttle, Direction and Magnitude);
+		Wait(0.100, Ignore Condition);
+		Stop Throttle In Direction(Event Player);
+		Loop;
+	}
+}
+
+rule("Rule 3")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Subtract(Facing Direction Of(Event Player), Vector(Random Integer(-100.000, 100), 0, Random Integer(
+			-100.000, 100))), 10000, To World, Direction and Turn Rate);
+		Wait(0.100, Ignore Condition);
+		Stop Facing(Event Player);
+		Loop;
+	}
+}
+
+rule("Rule 3")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Crouch);
+		Wait(1, Ignore Condition);
+		Loop;
+	}
+}

@@ -1,0 +1,627 @@
+variables
+{
+	player:
+		26: hit
+		28: djhud
+		29: baphud
+		46: ab1
+}
+
+rule("8D瞄准位置")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, hit, Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), 1000), Eye Position(Event Player)), All Players(All Teams), Event Player, True));
+	}
+}
+
+rule("8D击中")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Distance Between(Player Variable(Event Player, hit), Closest Player To(Player Variable(Event Player, hit), Opposite Team Of(
+			Team Of(Event Player)))) <= 3.500;
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, T, Add, 1);
+		Wait(Multiply(Add(Eye Position(Event Player), Player Variable(Event Player, hit)), 0.050), Ignore Condition);
+		Damage(Players Within Radius(Player Variable(Event Player, hit), 3.500, Opposite Team Of(Team Of(Event Player)),
+			Surfaces And Enemy Barriers), Event Player, 120);
+	}
+}
+
+rule("8D修复")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Baptiste);
+	}
+
+	actions
+	{
+		Destroy HUD Text(Player Variable(Event Player, baphud));
+	}
+}
+
+rule("天使")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Skip If(Compare(Player Variable(Event Player, D), !=, 0), 1);
+		Create Beam Effect(All Players(All Teams), Bad Beam, Add(Eye Position(Event Player), Facing Direction Of(Event Player)),
+			Players in View Angle(Event Player, Opposite Team Of(Team Of(Event Player)), 45), Purple, Visible To Position and Radius);
+		Set Player Variable(Event Player, D, Last Created Entity);
+	}
+}
+
+rule("天使")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == False;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, D));
+		Set Player Variable(Event Player, D, 0);
+	}
+}
+
+rule("8D取消治疗")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	actions
+	{
+		Set Healing Dealt(Event Player, 0);
+	}
+}
+
+rule("8D HUD")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, Custom String("武器命中率：{0}%", Multiply(Divide(Player Variable(Event Player, T), Player Variable(
+			Event Player, S)), 100), Null, Null), Null, Null, Left, 0, White, White, White, Visible To and String, Default Visibility);
+		Set Player Variable(Event Player, baphud, Last Text ID);
+	}
+}
+
+rule("8D命中")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, S, Add, 1);
+	}
+}
+
+rule("DJ左键")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, Add(Position Of(Event Player), Vector(0, 1, 0)));
+		Play Effect(All Players(All Teams), Bad Explosion, White, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 2)), 0.500);
+		Play Effect(All Players(All Teams), Bad Explosion, Green, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 4)), 0.500);
+		Play Effect(All Players(All Teams), Bad Explosion, White, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 10)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, Green, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 12)), 0.500);
+		Play Effect(All Players(All Teams), Bad Explosion, White, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 14)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, Green, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 16)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, White, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 18)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, Green, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 20)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, White, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 22)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, Green, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 24)), 0.500);
+		Play Effect(All Players(All Teams), Bad Explosion, White, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 26)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, Green, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 28)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, White, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 30)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, Green, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 32)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, White, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 34)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, White, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 36)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, Green, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 38)), 0.750);
+		Play Effect(All Players(All Teams), Bad Explosion, White, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 40)), 0.750);
+		Play Effect(All Players(All Teams), Buff Explosion Sound, White, Event Player, 10000);
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("DJ右键")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, Add(Position Of(Event Player), Vector(0, 1, 0)));
+		Play Effect(All Players(All Teams), Good Explosion, Blue, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 2)), 0.500);
+		Play Effect(All Players(All Teams), Good Explosion, Purple, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 4)), 0.500);
+		Play Effect(All Players(All Teams), Good Explosion, Blue, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 10)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Purple, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 12)), 0.500);
+		Play Effect(All Players(All Teams), Good Explosion, Blue, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 14)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Purple, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 16)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Blue, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 18)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Purple, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 20)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Blue, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 22)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Purple, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 24)), 0.500);
+		Play Effect(All Players(All Teams), Good Explosion, Blue, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 26)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Purple, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 28)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Blue, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 30)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Purple, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 32)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Blue, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 34)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Purple, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 36)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Blue, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 38)), 0.750);
+		Play Effect(All Players(All Teams), Good Explosion, Purple, Add(Player Variable(Event Player, A), Multiply(Facing Direction Of(
+			Event Player), 40)), 0.750);
+		Play Effect(All Players(All Teams), Buff Impact Sound, White, Event Player, 10000);
+		Set Player Variable(Event Player, ab1, 4);
+		Wait(4, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("DJ复活")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Healing Dealt(Event Player, 0);
+		Set Player Variable(Event Player, ab1, 0);
+		Set Move Speed(Event Player, 80);
+	}
+}
+
+rule("DJ技能")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, ab1) == 4;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, ab1, Subtract(Player Variable(Event Player, ab1), 0.250));
+		Wait(0.250, Ignore Condition);
+		Loop If(Compare(Player Variable(Event Player, ab1), !=, 0));
+	}
+}
+
+rule("DJ滑墙")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is On Wall(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Move Speed(Event Player, 200);
+		Set Gravity(Event Player, 60);
+	}
+}
+
+rule("DJ滑墙")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is On Wall(Event Player) == False;
+	}
+
+	actions
+	{
+		Set Move Speed(Event Player, 100);
+		Wait(1.200, Ignore Condition);
+		Set Gravity(Event Player, 100);
+	}
+}
+
+rule("DJ修复")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Lúcio);
+	}
+
+	actions
+	{
+		Destroy HUD Text(Player Variable(Event Player, djhud));
+		Set Move Speed(Event Player, 100);
+	}
+}
+
+rule("DJ HUD")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, Custom String("(右键)魔法飞弹：{0}", Player Variable(Event Player, ab1), Null, Null), Null, Null, Left, 0,
+			White, White, White, Visible To and String, Default Visibility);
+		Set Player Variable(Event Player, djhud, Last Text ID);
+	}
+}
+
+rule("DJ瞄准位置")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, hit, Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), 20), Eye Position(Event Player)), All Players(All Teams), Event Player, True));
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("DJ击中")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Distance Between(Player Variable(Event Player, hit), Closest Player To(Player Variable(Event Player, hit), Opposite Team Of(
+			Team Of(Event Player)))) <= 3;
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Wait(Multiply(Add(Eye Position(Event Player), Player Variable(Event Player, hit)), 0.050), Ignore Condition);
+		Damage(Players Within Radius(Player Variable(Event Player, hit), 3.500, Opposite Team Of(Team Of(Event Player)),
+			Surfaces And Enemy Barriers), Event Player, 95);
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("8D复活")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+}
+
+rule("DJ右键瞄准位置")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, hit, Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), 20), Eye Position(Event Player)), All Players(All Teams), Event Player, True));
+		Wait(4, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("DJ右键击中")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Lúcio;
+	}
+
+	conditions
+	{
+		Distance Between(Player Variable(Event Player, hit), Closest Player To(Player Variable(Event Player, hit), Opposite Team Of(
+			Team Of(Event Player)))) <= 3;
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, T, Add, 1);
+		Wait(Multiply(Add(Eye Position(Event Player), Player Variable(Event Player, hit)), 0.050), Ignore Condition);
+		Set Status(Players Within Radius(Player Variable(Event Player, hit), 3, Opposite Team Of(Team Of(Event Player)),
+			Surfaces And Enemy Barriers), Null, Stunned, 0.500);
+		Start Damage Over Time(Players Within Radius(Player Variable(Event Player, hit), 3, Opposite Team Of(Team Of(Event Player)),
+			Surfaces And Enemy Barriers), Event Player, 5, 30);
+		Wait(4, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("76")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, 0);
+		Wait(0.100, Ignore Condition);
+		Set Damage Received(Event Player, 100);
+	}
+}
+
+rule("清除 HUD")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Destroy HUD Text(Player Variable(Event Player, baphud));
+		Destroy HUD Text(Player Variable(Event Player, djhud));
+	}
+}
+
+rule("法鸡")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	conditions
+	{
+		Is Firing Primary(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, 0);
+		Wait(0.100, Ignore Condition);
+		Set Damage Received(Event Player, 100);
+	}
+}
+
+rule("毛妹")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zarya;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, 0);
+		Wait(0.100, Ignore Condition);
+		Set Damage Received(Event Player, 100);
+	}
+}
+
+rule("杀敌回血")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Heal(Attacker, Null, Max Health(Attacker));
+	}
+}

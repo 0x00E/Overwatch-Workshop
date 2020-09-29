@@ -1,0 +1,2039 @@
+variables
+{
+	global:
+		21: debug
+		26: mercy
+		27: facespeed
+
+	player:
+		26: master
+		27: wing
+		28: temp
+		29: player
+		30: torb
+}
+
+rule("Overwatch AI By:浅念#51206")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("debug")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(debug, False);
+	}
+}
+
+rule("init")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(O, 15);
+		Set Global Variable(I, 5);
+		Set Global Variable(P, Payload Position);
+		Set Global Variable(facespeed, 220);
+	}
+}
+
+rule("spawn")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Global Variable(S) == True;
+		Is Alive(Event Player) == True;
+		Is Assembling Heroes == False;
+		Number of Living Players(Team 1) >= 6;
+		Is In Setup == False;
+	}
+
+	actions
+	{
+		Modify Global Variable(G, Add, 1);
+		Wait(0.250, Ignore Condition);
+		Skip If(Compare(Is Team On Offense(Team 2), ==, True), 1);
+		Teleport(Event Player, Payload Position);
+		Skip If(Compare(Is Team On Offense(Team 2), ==, False), 1);
+		Teleport(Event Player, Global Variable(P));
+		Apply Impulse(Event Player, Down, 50, To World, Cancel Contrary Motion);
+	}
+}
+
+rule("bot teleport")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Global Variable(S) == True;
+		Is Alive(Event Player) == True;
+		Or(Compare(Distance Between(Position Of(Event Player), Payload Position), >, 25), Compare(Is In Line of Sight(Position Of(
+			Event Player), Payload Position, All Barriers Block LOS), ==, False)) == True;
+		Count Of(Player Variable(Event Player, R)) <= 0;
+		Is Assembling Heroes == False;
+		Number of Living Players(Team 1) >= 6;
+		Is Game In Progress == True;
+		Is In Setup == False;
+	}
+
+	actions
+	{
+		Wait(10, Abort When False);
+		Modify Global Variable(G, Add, 1);
+		Skip If(Compare(Is Team On Offense(Team 2), ==, False), 1);
+		Teleport(Event Player, Global Variable(P));
+		Skip If(Compare(Is Team On Offense(Team 2), ==, True), 1);
+		Teleport(Event Player, Payload Position);
+		Loop If Condition Is True;
+	}
+}
+
+rule("death")
+{
+	event
+	{
+		Player Died;
+		Team 1;
+		All;
+	}
+
+	actions
+	{
+		Set Respawn Max Time(Event Player, 999);
+		Set Player Variable(Event Player, R, Empty Array);
+		Set Move Speed(Event Player, 100);
+	}
+}
+
+rule("init")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, H, -1.000);
+		Set Player Variable(Event Player, L, 1);
+		Set Player Variable(Event Player, M, Empty Array);
+		Set Player Variable(Event Player, N, Empty Array);
+		Set Player Variable(Event Player, Q, Empty Array);
+		Set Player Variable(Event Player, J, Empty Array);
+		Set Player Variable(Event Player, P, Empty Array);
+		Set Player Variable(Event Player, F, False);
+	}
+}
+
+rule("keep")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, G, Filtered Array(Remove From Array(All Living Players(Team Of(Event Player)), Event Player),
+			Is In Line of Sight(Event Player, Current Array Element, Barriers Do Not Block LOS)));
+		Set Player Variable(Event Player, R, Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))), Compare(
+			Is In Line of Sight(Event Player, Current Array Element, Barriers Do Not Block LOS), ==, True)));
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("3% payload")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Payload Progress Percentage > 3;
+	}
+
+	actions
+	{
+		Set Global Variable(S, True);
+		Set Global Variable(G, 0.010);
+	}
+}
+
+rule("save payload postion")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Global Variable(J, Payload Position);
+	}
+}
+
+rule("create debug")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(debug) == True;
+	}
+
+	actions
+	{
+		Create Effect(All Players(All Teams), Ring, White, Add(Global Variable(A), Multiply(Down, 4)), Global Variable(I),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Ring, Red, Add(Global Variable(A), Multiply(Down, 4)), Global Variable(O),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Purple, Global Variable(W), Divide(Global Variable(Q), 2),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Green, Global Variable(P), Divide(Global Variable(Q), 2),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Yellow, Global Variable(A), 0.250, Visible To Position and Radius);
+		Create HUD Text(All Players(All Teams), Null, Null, Count Of(Global Variable(M)), Top, 0, White, White, Green,
+			Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Null, Null, Count Of(Global Variable(N)), Top, 0, White, White, Red, Visible To and String,
+			Default Visibility);
+	}
+}
+
+rule("init spawn")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(Q, 6);
+		Set Global Variable(N, Empty Array);
+		Set Global Variable(M, Empty Array);
+		Set Global Variable(G, 0.010);
+	}
+}
+
+rule("new spawn")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(G) == 0;
+		Count Of(Global Variable(M)) > 0;
+	}
+
+	actions
+	{
+		Set Global Variable(T, Random Value In Array(Global Variable(M)));
+		Skip If(Compare(Global Variable(T), ==, Null), 1);
+		Set Global Variable(P, Global Variable(T));
+		Skip If(Compare(Global Variable(P), !=, Null), 1);
+		Set Global Variable(P, Global Variable(A));
+		Set Global Variable(L, Ray Cast Hit Position(Global Variable(P), Subtract(Global Variable(P), Multiply(Up, 20)), Empty Array,
+			All Players(All Teams), False));
+	}
+}
+
+rule("sub spawn")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(G) > 0;
+	}
+
+	actions
+	{
+		Chase Global Variable At Rate(G, 0, 2, Destination and Rate);
+	}
+}
+
+rule("stop spawn")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(G) > 6;
+	}
+
+	actions
+	{
+		Set Global Variable(G, Min(Global Variable(G), 6));
+	}
+}
+
+rule("spawning")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(S) == True;
+		Or(Compare(Count Of(All Living Players(Team 1)), ==, 0), Compare(Global Variable(R), <=, 0)) == True;
+		Compare(Number of Living Players(Team 1), <, Multiply(Number of Players(Team 2), 2)) == True;
+		Global Variable(P) != Null;
+	}
+
+	actions
+	{
+		Set Global Variable(T, Randomized Array(Filtered Array(All Dead Players(Team 1), And(Compare(Subtract(Total Time Elapsed,
+			Player Variable(Current Array Element, K)), >, 0.500), Compare(Divide(Number of Heroes(Hero Of(Current Array Element), Team Of(
+			Current Array Element)), Number of Players(Team Of(Current Array Element))), >, Divide(Random Real(0, Subtract(100,
+			Payload Progress Percentage)), 100))))));
+		Set Global Variable(T, Filtered Array(Global Variable(T), Compare(Index Of Array Value(Global Variable(T), Current Array Element),
+			<, Round To Integer(Divide(Number of Players(Team 1), 2), Up))));
+		Respawn(Global Variable(T));
+		Wait(0.250, Ignore Condition);
+		Loop If(Compare(Count Of(Filtered Array(All Players(Team 1), Compare(Is In Spawn Room(Current Array Element), ==, True))), ==, 0));
+		Set Global Variable(R, Subtract(Add(Global Variable(F), 6), Number of Players(Team 2)));
+		Chase Global Variable At Rate(R, 0, 1, Destination and Rate);
+	}
+}
+
+rule("spawn")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Global Variable(G), >, 0)), Light Shaft, White, Global Variable(L),
+			Global Variable(G), Visible To Position and Radius);
+	}
+}
+
+rule("keep spawn")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Global Variable(N)) > 50;
+	}
+
+	actions
+	{
+		Set Global Variable(N, Sorted Array(Global Variable(N), Distance Between(Global Variable(A), Current Array Element)));
+		Set Global Variable(N, Filtered Array(Global Variable(N), Compare(Index Of Array Value(Global Variable(N), Current Array Element),
+			<, 25)));
+	}
+}
+
+rule("spawn list")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Global Variable(M)) < 4;
+		Global Variable(A) != Null;
+	}
+
+	actions
+	{
+		Set Global Variable(X, Random Integer(Global Variable(I), Global Variable(O)));
+		Skip If(Compare(Random Integer(0, 1), ==, 0), 1);
+		Modify Global Variable(X, Multiply, -1.000);
+		Set Global Variable(Z, Random Integer(Global Variable(I), Global Variable(O)));
+		Skip If(Compare(Random Integer(0, 1), ==, 0), 1);
+		Modify Global Variable(Z, Multiply, -1.000);
+		Set Global Variable(W, Add(Global Variable(A), Vector(Global Variable(X), Global Variable(Y), Global Variable(Z))));
+		Set Global Variable(W, Vector(Multiply(Round To Integer(Divide(X Component Of(Global Variable(W)), Global Variable(Q)),
+			To Nearest), Global Variable(Q)), Multiply(Round To Integer(Divide(Y Component Of(Global Variable(W)), Global Variable(Q)),
+			To Nearest), Global Variable(Q)), Multiply(Round To Integer(Divide(Z Component Of(Global Variable(W)), Global Variable(Q)),
+			To Nearest), Global Variable(Q))));
+		Skip If(Or(Array Contains(Global Variable(N), Global Variable(W)), Array Contains(Global Variable(M), Global Variable(W))), 7);
+		Skip If(And(Compare(Y Component Of(Ray Cast Hit Normal(Global Variable(W), Add(Global Variable(W), Multiply(Down, 15)),
+			Empty Array, All Players(All Teams), False)), >=, 0.990), Compare(Is In Line of Sight(Global Variable(W), Add(Global Variable(
+			W), Multiply(Down, 15)), Barriers Do Not Block LOS), ==, False)), 1);
+		Set Global Variable(N, Append To Array(Global Variable(N), Global Variable(W)));
+		Wait(0.250, Ignore Condition);
+		Skip If(Compare(Array Contains(Global Variable(N), Global Variable(W)), ==, True), 3);
+		Skip If(And(Compare(Is In Line of Sight(Global Variable(A), Global Variable(W), Barriers Do Not Block LOS), ==, False), Compare(
+			Count Of(Filtered Array(Global Variable(M), Compare(Is In Line of Sight(Current Array Element, Global Variable(W),
+			Barriers Do Not Block LOS), ==, True))), ==, 0)), 1);
+		Set Global Variable(M, Append To Array(Global Variable(M), Global Variable(W)));
+		Wait(Add(0.250, Multiply(0.250, Count Of(Global Variable(M)))), Ignore Condition);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("y")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Set Global Variable(A, Payload Position);
+		Skip If(And(Compare(Global Variable(A), !=, Global Variable(J)), Compare(Global Variable(A), !=, Null)), 1);
+		Set Global Variable(A, Objective Position(0));
+		Modify Global Variable(A, Add, Multiply(Up, 4));
+		Set Global Variable(Y, Subtract(Y Component Of(Ray Cast Hit Position(Global Variable(A), Add(Global Variable(A), Multiply(Up, 10)),
+			Empty Array, Empty Array, False)), 4));
+		Modify Global Variable(Y, Subtract, Y Component Of(Global Variable(A)));
+		Set Global Variable(M, Filtered Array(Global Variable(M), And(Compare(Distance Between(Current Array Element, Vector(
+			X Component Of(Global Variable(A)), Y Component Of(Current Array Element), Z Component Of(Global Variable(A)))), <=,
+			Global Variable(O)), Compare(Distance Between(Current Array Element, Vector(X Component Of(Global Variable(A)), Y Component Of(
+			Current Array Element), Z Component Of(Global Variable(A)))), >=, Global Variable(I)))));
+		Loop If Condition Is True;
+	}
+}
+
+rule("spawn for end")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(J) != Payload Position;
+		Payload Progress Percentage >= 88;
+	}
+
+	actions
+	{
+		Set Global Variable(O, 15);
+		Set Global Variable(I, 5);
+	}
+}
+
+rule("bot init")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Brigitte), Team 1, -1.000, Payload Position, All Players(Team 1));
+		Create Dummy Bot(Hero(Mercy), Team 1, -1.000, Payload Position, All Players(Team 1));
+		Create Dummy Bot(Hero(Orisa), Team 1, -1.000, Payload Position, All Players(Team 1));
+		Create Dummy Bot(Hero(Sigma), Team 1, -1.000, Payload Position, All Players(Team 1));
+		Create Dummy Bot(Hero(Hanzo), Team 1, -1.000, Payload Position, All Players(Team 1));
+		Create Dummy Bot(Hero(Soldier: 76), Team 1, -1.000, Payload Position, All Players(Team 1));
+	}
+}
+
+rule("bot spawn")
+{
+	event
+	{
+		Player Died;
+		Team 1;
+		All;
+	}
+
+	actions
+	{
+		Wait(10, Ignore Condition);
+		Respawn(Event Player);
+		Teleport(Event Player, Payload Position);
+	}
+}
+
+rule("moira right")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Moira;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Secondary Fire);
+		Wait(3, Ignore Condition);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Loop;
+	}
+}
+
+rule("pharah jump")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Pharah;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Jump);
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("genji two jump")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Genji;
+	}
+
+	conditions
+	{
+		Distance Between(Event Player, Closest Player To(Event Player, Team 2)) < 5;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Jump);
+		Wait(0.250, Ignore Condition);
+		Loop If(Compare(Distance Between(Event Player, Closest Player To(Event Player, Team 2)), <, 5));
+		Loop If Condition Is True;
+	}
+}
+
+rule("genji shift")
+{
+	event
+	{
+		Player Earned Elimination;
+		Team 1;
+		Genji;
+	}
+
+	actions
+	{
+		Set Ability 1 Enabled(Event Player, False);
+		Wait(0.500, Ignore Condition);
+		Set Ability 1 Enabled(Event Player, True);
+	}
+}
+
+rule("doom random right")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Doomfist;
+	}
+
+	actions
+	{
+		Wait(3, Ignore Condition);
+		Start Holding Button(Event Player, Secondary Fire);
+		Wait(Random Real(0, 3), Ignore Condition);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Loop;
+	}
+}
+
+rule("bot facing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dead(Event Player) == False;
+		Hero Of(Event Player) != Hero(Mercy);
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Player Variable(Event Player, player))),
+			Global Variable(facespeed), To World, Direction and Turn Rate);
+	}
+}
+
+rule("bot jump")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Jump) == True;
+	}
+
+	actions
+	{
+		Press Button(Random Value In Array(All Players(Team 1)), Jump);
+	}
+}
+
+rule("bot move")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Event Player, Closest Player To(Event Player, Team 2)) <= 3.500;
+	}
+
+	actions
+	{
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Start Throttle In Direction(Event Player, Left, 1.500, To Player, Replace existing throttle, Direction and Magnitude);
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Start Throttle In Direction(Event Player, Right, 1.500, To Player, Replace existing throttle, Direction and Magnitude);
+		Loop If(Compare(Distance Between(Event Player, Closest Player To(Event Player, Team 2)), <, 3.500));
+		Loop If Condition Is True;
+		Stop Throttle In Direction(Event Player);
+	}
+}
+
+rule("bot took damage move")
+{
+	event
+	{
+		Player Took Damage;
+		Team 1;
+		All;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Random Value In Array(Append To Array(Left, Right)), 2, To Player,
+			Add to existing throttle, Direction and Magnitude);
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Start Throttle In Direction(Event Player, Left, 2, To Player, Add to existing throttle, Direction and Magnitude);
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Start Throttle In Direction(Event Player, Right, 2, To Player, Add to existing throttle, Direction and Magnitude);
+	}
+}
+
+rule("remove setup time")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is In Setup == True;
+		Is Team On Defense(Team 1) == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, P, Sorted Array(Players Within Radius(Event Player, 1000, Opposite Team Of(Team Of(
+			Event Player)), Surfaces And Enemy Barriers), Distance Between(Event Player, Current Array Element)));
+		Set Player Variable(Event Player, P, Filtered Array(Player Variable(Event Player, P), Or(Compare(Hero Of(Current Array Element),
+			!=, Hero(Sombra)), Compare(Is Using Ability 1(Event Player), ==, False))));
+		Set Player Variable(Event Player, temp, Value In Array(Filtered Array(Player Variable(Event Player, P), Compare(Is Dead(
+			Event Player), ==, False)), 0));
+		Set Player Variable(Event Player, player, Player Variable(Event Player, temp));
+		Wait(0.500, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("assembling time")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(10);
+	}
+}
+
+rule("bot stop fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Primary Fire);
+		Stop Holding Button(Event Player, Secondary Fire);
+	}
+}
+
+rule("stop facing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, player) == 0;
+		Hero Of(Event Player) != Hero(Mercy);
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+	}
+}
+
+rule("support")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Event Player, Payload Position) > 7;
+		Array Contains(All Support Heroes, Hero Of(Event Player)) == True;
+		Is In Spawn Room(Event Player) == False;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player, Payload Position), 1, To World,
+			Replace existing throttle, Direction and Magnitude);
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+		Stop Throttle In Direction(Event Player);
+	}
+}
+
+rule("tank")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Event Player, Payload Position) > 10;
+		Array Contains(All Tank Heroes, Hero Of(Event Player)) == True;
+		Is In Spawn Room(Event Player) == False;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player, Payload Position), 1, To World,
+			Replace existing throttle, Direction and Magnitude);
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+		Stop Throttle In Direction(Event Player);
+	}
+}
+
+rule("damage")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Event Player, Payload Position) > 14;
+		Array Contains(All Damage Heroes, Hero Of(Event Player)) == True;
+		Is In Spawn Room(Event Player) == False;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player, Payload Position), 1, To World,
+			Replace existing throttle, Direction and Magnitude);
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+		Stop Throttle In Direction(Event Player);
+	}
+}
+
+rule("brig")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+		Wait(0.350, Ignore Condition);
+		Stop Holding Button(Event Player, Primary Fire);
+		Wait(0.100, Ignore Condition);
+		Start Holding Button(Event Player, Secondary Fire);
+		Wait(0.500, Ignore Condition);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Loop If Condition Is True;
+	}
+}
+
+rule("bap")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Primary Fire);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("sigma")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Sigma;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("hanzo")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Hanzo;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+		Wait(1.200, Ignore Condition);
+		Stop Holding Button(Event Player, Primary Fire);
+		Loop If Condition Is True;
+	}
+}
+
+rule("soilder")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("stop shoot")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dead(Player Variable(Event Player, player)) == True;
+		Hero Of(Event Player) != Hero(Mercy);
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("dead stop facing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dead(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+	}
+}
+
+rule("bot stop move")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Throttle In Direction(Event Player);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("brig E")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == False;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 2);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("stop shoot")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, player) == 0;
+		Hero Of(Event Player) != Hero(Mercy);
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("stop facing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Dead(Player Variable(Event Player, player)) == True;
+		Hero Of(Event Player) != Hero(Mercy);
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+	}
+}
+
+rule("mercy init")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Jump);
+		Set Global Variable(mercy, Event Player);
+	}
+}
+
+rule("mercy full heal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Mercy);
+		Health(Player Variable(Event Player, master)) >= Multiply(Max Health(Player Variable(Event Player, master)), 1);
+		Player Variable(Event Player, wing) == 0;
+		Player Variable(Event Player, E) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Primary Fire);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Start Holding Button(Event Player, Secondary Fire);
+	}
+}
+
+rule("mecry not full heal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Mercy);
+		Health(Player Variable(Event Player, master)) < Multiply(Max Health(Player Variable(Event Player, master)), 1);
+		Player Variable(Event Player, wing) == 0;
+		Player Variable(Event Player, E) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Primary Fire);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("mercy stop move")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Mercy);
+		Distance Between(Event Player, Player Variable(Event Player, master)) <= 3;
+	}
+
+	actions
+	{
+		Skip If(Compare(Distance Between(Event Player, Player Variable(Event Player, master)), >, 3), 1);
+		Stop Throttle In Direction(Event Player);
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("mercy move")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Mercy);
+		Distance Between(Event Player, Player Variable(Event Player, master)) > 3;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Direction Towards(Eye Position(Event Player), Position Of(Player Variable(Event Player,
+			master))), 1, To World, Replace existing throttle, Direction and Magnitude);
+		Stop Holding Button(Event Player, Ability 1);
+		Wait(0.500, Ignore Condition);
+		Start Holding Button(Event Player, Ability 1);
+	}
+}
+
+rule("mercy wing #1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, wing) == 1;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+		Wait(0.400, Ignore Condition);
+		Stop Holding Button(Event Player, Primary Fire);
+		Wait(0.080, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("mercy wing #1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Mercy);
+		Is Communicating(Player Variable(Event Player, master), Need Healing) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, wing, 1);
+		Stop Holding Button(Event Player, Primary Fire);
+		Stop Holding Button(Event Player, Secondary Fire);
+	}
+}
+
+rule("mercy wing #2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, wing) == 2;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+		Wait(0.100, Ignore Condition);
+		Stop Holding Button(Event Player, Primary Fire);
+		Start Holding Button(Event Player, Secondary Fire);
+		Wait(0.100, Ignore Condition);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Loop If Condition Is True;
+	}
+}
+
+rule("mercy wing #2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Mercy);
+		Is Communicating(Player Variable(Event Player, master), Ultimate Status) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, wing, 2);
+		Stop Holding Button(Event Player, Primary Fire);
+		Stop Holding Button(Event Player, Secondary Fire);
+	}
+}
+
+rule("mercy stop wing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Mercy);
+		Is Communicating(Player Variable(Event Player, master), Thanks) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, wing, 0);
+		Stop Holding Button(Event Player, Crouch);
+	}
+}
+
+rule("mercy jump")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Jump);
+		Wait(Random Integer(10, 20), Ignore Condition);
+		Loop;
+	}
+}
+
+rule("bot took damage")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Event Player) == False;
+		Has Status(Event Player, Asleep) == False;
+	}
+
+	actions
+	{
+		Skip If(Compare(Is Crouching(Player Variable(Event Player, master)), ==, True), 5);
+		Skip If(Compare(Player Variable(Event Player, wing), !=, 0), 4);
+		Skip If(Compare(Random Integer(1, 5), !=, 3), 3);
+		Start Holding Button(Event Player, Crouch);
+		Wait(Random Real(0.150, 0.250), Ignore Condition);
+		Stop Holding Button(Event Player, Crouch);
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("mercy move")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Random Value In Array(Append To Array(Left, Right)), 1.500, To Player,
+			Add to existing throttle, Direction and Magnitude);
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Start Throttle In Direction(Event Player, Left, 1.500, To Player, Replace existing throttle, Direction and Magnitude);
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Start Throttle In Direction(Event Player, Right, 1.500, To Player, Replace existing throttle, Direction and Magnitude);
+	}
+}
+
+rule("mercy Q")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ultimate);
+	}
+}
+
+rule("mercy move dead man")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Team Of(Event Player) == Team Of(Global Variable(mercy));
+	}
+
+	actions
+	{
+		Start Facing(Global Variable(mercy), Direction Towards(Eye Position(Global Variable(mercy)), Position Of(Event Player)), 10000,
+			To World, Direction and Turn Rate);
+		Start Throttle In Direction(Global Variable(mercy), Direction Towards(Eye Position(Global Variable(mercy)), Position Of(
+			Event Player)), 1, To World, Replace existing throttle, Direction and Magnitude);
+		Press Button(Global Variable(mercy), Ability 1);
+	}
+}
+
+rule("mercy master")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, temp, Filtered Array(Players in View Angle(Event Player, Team 1, 180), And(Compare(
+			Is In Line of Sight(Eye Position(Event Player), Current Array Element, All Barriers Block LOS), ==, True), Compare(
+			Distance Between(Event Player, Current Array Element), <=, 999))));
+		Set Player Variable(Event Player, temp, Sorted Array(Player Variable(Event Player, temp), Subtract(Normalized Health(
+			Current Array Element), And(Is Using Ultimate(Event Player), Compare(Hero Of(Current Array Element), ==, Hero(Genji))))));
+		Skip If(Compare(Player Variable(Event Player, master), ==, Value In Array(Player Variable(Event Player, temp), 0)), 6);
+		Stop Holding Button(Event Player, Primary Fire);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Set Player Variable(Event Player, wing, 0);
+		Set Player Variable(Event Player, E, False);
+		Wait(0.250, Ignore Condition);
+		Set Player Variable(Event Player, E, True);
+		Set Player Variable(Event Player, master, Value In Array(Player Variable(Event Player, temp), 0));
+		Wait(0, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("mercy facing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Mercy);
+		Is In Spawn Room(Event Player) == False;
+	}
+
+	actions
+	{
+		Skip If(Or(Has Status(Event Player, Asleep), Is Dead(Event Player)), 1);
+		Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Player Variable(Event Player, master))),
+			Global Variable(facespeed), To World, Direction and Turn Rate);
+	}
+}
+
+rule("mercy E")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 2);
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("mercy crouch")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, wing) != 0;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Crouch);
+	}
+}
+
+rule("mercy crouch for master")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Crouching(Player Variable(Event Player, master)) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Crouch);
+	}
+}
+
+rule("mercy stop crouch for master")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Crouching(Player Variable(Event Player, master)) == False;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Crouch);
+	}
+}
+
+rule("mercy E cd")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, C, 30);
+	}
+}
+
+rule("mercy E timer")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, C) == 30;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, C, Subtract(Player Variable(Event Player, C), 1));
+		Wait(1, Ignore Condition);
+		Loop If(Compare(Player Variable(Event Player, C), !=, 0));
+	}
+}
+
+rule("mercy stop facing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+	}
+}
+
+rule("fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+		Wait(0.250, Ignore Condition);
+		Stop Holding Button(Event Player, Primary Fire);
+		Loop If Condition Is True;
+	}
+}
+
+rule("dead stop facing")
+{
+	event
+	{
+		Player Died;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+	}
+}
+
+rule("sigma stop shoot")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Mercy);
+		Is Dummy Bot(Event Player) == True;
+		Is Dead(Event Player) == False;
+		Has Status(Event Player, Asleep) == False;
+		Or(Compare(Player Variable(Event Player, player), ==, 0), Is Dead(Player Variable(Event Player, player))) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("dead stop facing")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Or(Is Dead(Event Player), Has Status(Event Player, Asleep)) == True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Event Player);
+	}
+}
+
+rule("sigma shift")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Or(Compare(Event Damage, >, 50), Compare(Normalized Health(Event Player), <, 0.500)) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 1);
+	}
+}
+
+rule("sigma E")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+		Distance Between(Event Player, Player Variable(Event Player, player)) <= 6;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 2);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("sigma right")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Secondary Fire);
+		Wait(Multiply(Distance Between(Event Player, Player Variable(Event Player, player)), 0.100), Ignore Condition);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Wait(1.800, Ignore Condition);
+		Press Button(Event Player, Secondary Fire);
+		Loop If Condition Is True;
+	}
+}
+
+rule("sigma Q")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+		Ultimate Charge Percent(Event Player) == 100;
+		Health(Event Player) >= 50;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ultimate);
+		Wait(1, Ignore Condition);
+		Press Button(Event Player, Primary Fire);
+	}
+}
+
+rule("bot jump")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Dead(Event Player) == False;
+		Has Status(Event Player, Asleep) == False;
+		Is In Spawn Room(Event Player) == False;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Jump);
+		Wait(Random Integer(2, 5), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("bot crouch")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Dead(Event Player) == False;
+		Has Status(Event Player, Asleep) == False;
+		Is In Spawn Room(Event Player) == False;
+	}
+
+	actions
+	{
+		Skip If(Compare(Random Integer(0, 1), ==, 1), 1);
+		Press Button(Event Player, Crouch);
+		Wait(Random Integer(5, 10), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("orisa fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Orisa;
+	}
+
+	conditions
+	{
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("orisa shift")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Or(Compare(Event Damage, >, 100), Compare(Normalized Health(Event Player), <, 0.750)) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 1);
+	}
+}
+
+rule("brig shift")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is In Spawn Room(Event Player) == False;
+		Is Dead(Player Variable(Event Player, player)) != True;
+		Player Variable(Event Player, player) != 0;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 1);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("save torb")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Torbjörn;
+	}
+
+	conditions
+	{
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, torb, Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), 1000), Eye Position(Event Player)), All Players(All Teams), Event Player, True));
+	}
+}

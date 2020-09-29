@@ -1,0 +1,945 @@
+rule("AI初始化")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Respawning(Event Player);
+	}
+}
+
+rule("全局初始化")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(H, Empty Array);
+		Modify Global Variable(H, Append To Array, Hero(Ashe));
+		Modify Global Variable(H, Append To Array, Hero(Hanzo));
+		Modify Global Variable(H, Append To Array, Hero(McCree));
+		Modify Global Variable(H, Append To Array, Hero(Soldier: 76));
+		Modify Global Variable(H, Append To Array, Hero(Widowmaker));
+		Set Global Variable(C, Vector(215, 28, -40.000));
+		Set Global Variable(Z, Empty Array);
+		Modify Global Variable(Z, Append To Array, Hero(Ashe));
+		Modify Global Variable(Z, Append To Array, Hero(Widowmaker));
+		Modify Global Variable(Z, Append To Array, Hero(Soldier: 76));
+		Disable Built-In Game Mode Music;
+	}
+}
+
+rule("初始化")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Set Player Variable At Index(Event Player, V, 0, 0);
+		Set Player Variable At Index(Event Player, V, 1, 0);
+	}
+}
+
+rule("创建AI")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Players(All Teams) <= 12;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Random Value In Array(Global Variable(H)), All Teams, -1.000, Add(Global Variable(C), Vector(Random Integer(
+			-8.000, 8), 0, Random Integer(-19.000, 19))), Vector(0, 0, 0));
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("取消等待时间")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Waiting For Players == False;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("AI视角")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Aim Speed(Event Player, 10000);
+		Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Player Variable(Event Player, P))), 100,
+			To World, Direction and Turn Rate);
+	}
+}
+
+rule("目标玩家P")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, O, Closest Player To(Event Player, All Teams));
+		Skip If(Compare(Is In Line of Sight(Eye Position(Event Player), Eye Position(Player Variable(Event Player, O)),
+			All Barriers Block LOS), ==, False), 1);
+		Set Player Variable(Event Player, P, Player Variable(Event Player, O));
+		Skip If(Compare(Is In Line of Sight(Eye Position(Event Player), Eye Position(Player Variable(Event Player, O)),
+			All Barriers Block LOS), ==, True), 1);
+		Set Player Variable(Event Player, P, Player Variable(Event Player, K));
+		Skip If(Compare(Count Of(Filtered Array(All Players(All Teams), Compare(Player Variable(Event Player, P), ==,
+			Current Array Element))), <=, 0), 2);
+		Skip If(Compare(Health(Player Variable(Event Player, P)), <=, 0), 1);
+		Set Player Variable(Event Player, N, 0);
+		Skip If(Or(Compare(Count Of(Filtered Array(All Players(All Teams), Compare(Player Variable(Event Player, P), ==,
+			Current Array Element))), >=, 1), Compare(Health(Player Variable(Event Player, P)), >=, 1)), 1);
+		Set Player Variable(Event Player, N, 1);
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("自定义N")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, K, Filtered Array(Players in View Angle(Event Player, All Teams, 180), Compare(
+			Is In Line of Sight(Eye Position(Event Player), Eye Position(Current Array Element), All Barriers Block LOS), ==, True)));
+		Set Player Variable(Event Player, K, Value In Array(Player Variable(Event Player, K), 0));
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("AI恢复")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, N) == 0;
+	}
+
+	actions
+	{
+		Set Player Variable At Index(Event Player, V, 0, 1);
+	}
+}
+
+rule("AI中断")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, N) == 1;
+	}
+
+	actions
+	{
+		Set Player Variable At Index(Event Player, V, 0, 0);
+	}
+}
+
+rule("击杀治疗")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Heal(Event Player, Null, 100000);
+	}
+}
+
+rule("AI切换")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable At Index(Event Player, V, 1, 0);
+		Wait(1, Ignore Condition);
+		Start Forcing Player To Be Hero(Event Player, Random Value In Array(Global Variable(H)));
+		Respawn(Event Player);
+	}
+}
+
+rule("强制英雄")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+	}
+
+	actions
+	{
+		Start Forcing Player To Be Hero(Event Player, Global Variable(H));
+	}
+}
+
+rule("机器人阈值")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Event Player, Player Variable(Event Player, P)) > 30;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player, Player Variable(Event Player, P)), 1, To World,
+			Replace existing throttle, Direction and Magnitude);
+		Wait(0.500, Ignore Condition);
+		Loop If(Compare(Distance Between(Event Player, Player Variable(Event Player, P)), >, 30));
+		Loop If Condition Is True;
+		Stop Throttle In Direction(Event Player);
+	}
+}
+
+rule("机器人跳跃")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Skip If(Compare(Hero Of(Event Player), ==, Hero(Widowmaker)), 10000);
+		Press Button(Event Player, Jump);
+		Wait(Random Integer(10, 20), Ignore Condition);
+		Loop;
+	}
+}
+
+rule("机器人蹲")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Skip If(Compare(Random Integer(1, 5), !=, 3), 3);
+		Start Holding Button(Event Player, Crouch);
+		Wait(Random Real(0.150, 0.250), Ignore Condition);
+		Stop Holding Button(Event Player, Crouch);
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Loop;
+	}
+}
+
+rule("机器人左右")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Event Player, Closest Player To(Event Player, All Teams)) <= 30;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Start Throttle In Direction(Event Player, Left, 1.500, To Player, Replace existing throttle, Direction and Magnitude);
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Start Throttle In Direction(Event Player, Right, 1.500, To Player, Replace existing throttle, Direction and Magnitude);
+		Loop If(Compare(Distance Between(Event Player, Closest Player To(Event Player, All Teams)), <, 30));
+		Loop If Condition Is True;
+		Stop Throttle In Direction(Event Player);
+	}
+}
+
+rule("机器人规避")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Random Value In Array(Append To Array(Left, Right)), 2, To Player,
+			Add to existing throttle, Direction and Magnitude);
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Start Throttle In Direction(Event Player, Left, 2, To Player, Add to existing throttle, Direction and Magnitude);
+		Wait(Random Real(0.500, 1.500), Ignore Condition);
+		Start Throttle In Direction(Event Player, Right, 2, To Player, Add to existing throttle, Direction and Magnitude);
+	}
+}
+
+rule("76")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("麦克雷")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(McCree);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("半藏")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Hanzo);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Abort If Condition Is False;
+		Start Holding Button(Event Player, Primary Fire);
+		Wait(1, Ignore Condition);
+		Skip If(Compare(Is Using Ability 2(Event Player), ==, True), 1);
+		Stop Holding Button(Event Player, Primary Fire);
+		Loop If Condition Is True;
+	}
+}
+
+rule("黑百合")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Widowmaker);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Abort If Condition Is False;
+		Wait(0.250, Ignore Condition);
+		Start Holding Button(Event Player, Secondary Fire);
+		Wait(1.200, Ignore Condition);
+		Press Button(Event Player, Primary Fire);
+		Wait(0.250, Ignore Condition);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Loop If Condition Is True;
+	}
+}
+
+rule("艾什")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Ashe);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Abort If Condition Is False;
+		Wait(0.250, Ignore Condition);
+		Press Button(Event Player, Primary Fire);
+		Loop If Condition Is True;
+	}
+}
+
+rule("艾什开镜")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Ashe);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Start Holding Button(Event Player, Secondary Fire);
+	}
+}
+
+rule("重生后停止之前的行为")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Secondary Fire);
+		Stop Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("重生点")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Value In Array(Player Variable(Event Player, V), 1) == 1;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Add(Global Variable(C), Vector(Random Integer(-8.000, 8), 0, Random Integer(-19.000, 19))));
+	}
+}
+
+rule("玩家在角斗场外重生")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Or(Or(Or(Or(Compare(Y Component Of(Position Of(Event Player)), <, 24), Compare(X Component Of(Position Of(Event Player)), <, 170)),
+			Compare(X Component Of(Position Of(Event Player)), >, 229)), Compare(Z Component Of(Position Of(Event Player)), <, -66.000)),
+			Compare(Z Component Of(Position Of(Event Player)), >, -15.000)) == True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable At Index(Event Player, V, 1, 1);
+	}
+}
+
+rule("AI复活重生")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable At Index(Event Player, V, 1, 1);
+	}
+}
+
+rule("玩家切换")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+	}
+
+	actions
+	{
+		Set Player Variable At Index(Event Player, V, 1, 0);
+		Teleport(Event Player, Vector(10000, 10000, 10000));
+	}
+}
+
+rule("游戏开始杀死所有人")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Destroy All Dummy Bots;
+		Set Player Variable At Index(All Players(All Teams), V, 1, 0);
+	}
+}
+
+rule("玩家复活重生")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+		And(Has Spawned(Event Player), Is Alive(Event Player)) == True;
+	}
+
+	actions
+	{
+		Set Player Variable At Index(Event Player, V, 1, 1);
+	}
+}
+
+rule("Rule 35")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Global Variable(Z), Hero Of(Event Player)) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Secondary Fire Enabled(Event Player, True);
+	}
+}
+
+rule("Rule 36")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Global Variable(Z), Hero Of(Event Player)) == False;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Secondary Fire Enabled(Event Player, False);
+	}
+}
+
+rule("Rule 35")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+		Value In Array(Player Variable(Event Player, V), 100) != 1;
+		Event Player == Host Player;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Phased Out, 9999);
+		Destroy HUD Text(Value In Array(Player Variable(Event Player, V), 110));
+		Wait(0.250, Ignore Condition);
+		Create HUD Text(Event Player, String("On", Null, Null, Null), Null, Null, Left, 0, Green, White, White, Visible To and String,
+			Default Visibility);
+		Wait(0.250, Ignore Condition);
+		Set Player Variable At Index(Event Player, V, 110, Last Text ID);
+		Wait(0.500, Ignore Condition);
+		Set Player Variable At Index(Event Player, V, 100, 1);
+	}
+}
+
+rule("Rule 35")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+		Value In Array(Player Variable(Event Player, V), 100) == 1;
+		Event Player == Host Player;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Phased Out);
+		Destroy HUD Text(Value In Array(Player Variable(Event Player, V), 110));
+		Wait(0.250, Ignore Condition);
+		Create HUD Text(Event Player, String("Off", Null, Null, Null), Null, Null, Left, 0, Red, White, White, Visible To and String,
+			Default Visibility);
+		Wait(0.250, Ignore Condition);
+		Set Player Variable At Index(Event Player, V, 110, Last Text ID);
+		Wait(0.500, Ignore Condition);
+		Set Player Variable At Index(Event Player, V, 100, 0);
+	}
+}
+
+rule("Rule 36")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Secondary Fire);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Rule 36")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Hanzo);
+		Is Alive(Event Player) == True;
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("Rule 36")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Hanzo);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 2);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("小障碍-区域1")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		True == True;
+	}
+
+	actions
+	{
+		Set Global Variable(B, Empty Array);
+		Set Global Variable(S, Empty Array);
+		Modify Global Variable(B, Append To Array, Vector(173, 29.761, -52.899));
+		Modify Global Variable(S, Append To Array, 30);
+	}
+}
+
+rule("创建小型球形障碍")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		True == True;
+	}
+
+	actions
+	{
+		Create Effect(All Players(All Teams), Sphere, Red, Value In Array(Global Variable(B), 0), Value In Array(Global Variable(S), 0),
+			Visible To);
+	}
+}
+
+rule("0")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Value In Array(Global Variable(B), 0)) <= Value In Array(Global Variable(S), 0);
+	}
+
+	actions
+	{
+		Wait(0.200, Ignore Condition);
+		Abort If(Compare(Distance Between(Position Of(Event Player), Value In Array(Global Variable(B), 0)), ==, Value In Array(
+			Global Variable(S), 0)));
+		Wait(0.010, Ignore Condition);
+		Apply Impulse(Event Player, Direction Towards(Value In Array(Global Variable(B), 0), Event Player), 100, To World,
+			Cancel Contrary Motion);
+		Loop If Condition Is True;
+	}
+}

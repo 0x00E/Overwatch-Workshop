@@ -1,0 +1,636 @@
+variables
+{
+	global:
+		26: reset
+}
+
+rule("源氏VS大锤 博物馆 By：浅念#51026")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create HUD Text(All Players(All Teams), Custom String("源氏VS大锤博物馆", Null, Null, Null), Null, Null, Top, 0, Green, White, White,
+			Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Custom String("按互动(F键)申请重置", Null, Null, Null), Null, Null, Left, 0, Yellow, White, White,
+			Visible To and String, Default Visibility);
+	}
+}
+
+rule("源氏变量")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, Z, Slot Of(Event Player));
+	}
+}
+
+rule("大锤变量")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, Z, Slot Of(Event Player));
+	}
+}
+
+rule("源氏初始化")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Filtered Array(All Players(Team 1), And(Compare(Is Dummy Bot(Current Array Element), ==, True), Compare(Hero Of(
+			Current Array Element), ==, Hero(Genji))))) < 3;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Genji), Team 1, -1.000, Vector(-45.852, 7.420, 6.540), Forward);
+		Create Dummy Bot(Hero(Genji), Team 1, -1.000, Vector(-31.273, 12.373, 29.945), Left);
+		Create Dummy Bot(Hero(Genji), Team 1, -1.000, Vector(0.148, 2.211, 7.953), Backward);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("瞬转源氏")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 1;
+		Is Dead(Event Player) == False;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("米奇妙妙屋", Null, Null, Null), Event Player, 2, Do Not Clip,
+			Visible To Position and String, White, Default Visibility);
+		Press Button(Event Player, Ability 2);
+		Wait(0.100, Ignore Condition);
+		Press Button(Event Player, Ability 1);
+		Wait(0.100, Ignore Condition);
+		Set Facing(Event Player, Backward, To Player);
+		Loop If Condition Is True;
+	}
+}
+
+rule("占位大锤")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Reinhardt), Team 2, -1.000, Vector(-14.139, 4.203, 21.105), Right);
+	}
+}
+
+rule("禁用默认重生")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Respawning(All Players(All Teams));
+	}
+}
+
+rule("占位源氏")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Genji), Team 1, -1.000, Vector(-45.852, 7.420, 6.540), Forward);
+	}
+}
+
+rule("大锤初始化")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Filtered Array(All Players(Team 2), And(Compare(Is Dummy Bot(Current Array Element), ==, True), Compare(Hero Of(
+			Current Array Element), ==, Hero(Reinhardt))))) < 4;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Reinhardt), Team 2, -1.000, Vector(18.428, 9.996, 22.164), Right);
+		Create Dummy Bot(Hero(Reinhardt), Team 2, -1.000, Vector(16.405, 10.098, -22.236), Right);
+		Create Dummy Bot(Hero(Reinhardt), Team 2, -1.000, Vector(-7.931, 4.799, -18.069), Right);
+		Create Dummy Bot(Hero(Reinhardt), Team 2, -1.000, Vector(-0.010, 2.205, -9.344), Forward);
+		Create Dummy Bot(Hero(Reinhardt), Team 2, -1.000, Vector(-12.486, 2.203, 7.974), Forward);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("二段飞天锤")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 1;
+		Global Variable(reset) == True;
+	}
+
+	actions
+	{
+		Respawn(Event Player);
+		Wait(0.250, Ignore Condition);
+		Teleport(Event Player, Vector(17.503, 10.098, 22.763));
+		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Vector(10.412, 10.091, 21.214)), To World);
+		Wait(0.250, Ignore Condition);
+		Press Button(Event Player, Ability 1);
+		Wait(1.800, Ignore Condition);
+		Press Button(Event Player, Ability 1);
+	}
+}
+
+rule("老阴B")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, Z) == 3;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("老阴B", Null, Null, Null), Event Player, 2, Do Not Clip,
+			Visible To Position and String, White, Default Visibility);
+		Start Holding Button(Event Player, Crouch);
+		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Vector(-7.759, 4.798, -24.931)), To World);
+	}
+}
+
+rule("飞天锤")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 2;
+		Global Variable(reset) == True;
+	}
+
+	actions
+	{
+		Respawn(Event Player);
+		Wait(0.250, Ignore Condition);
+		Teleport(Event Player, Vector(16.405, 10.098, -22.236));
+		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Vector(10.411, 10.090, -21.500)), To World);
+		Wait(0.250, Ignore Condition);
+		Press Button(Event Player, Ability 1);
+	}
+}
+
+rule("无缝E源氏")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 2;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("卡E萌新", Null, Null, Null), Event Player, 2, Do Not Clip,
+			Visible To Position and String, White, Default Visibility);
+		Start Throttle In Direction(Event Player, Forward, 1, To World, Replace existing throttle, Direction and Magnitude);
+		Set Facing(Event Player, Left, To World);
+		Start Holding Button(Event Player, Jump);
+		Wait(0.100, Ignore Condition);
+		Stop Holding Button(Event Player, Jump);
+		Press Button(Event Player, Ability 2);
+		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Vector(-15.729, 2.199, 14.904)), To World);
+		Teleport(Event Player, Vector(-31.273, 12.373, 29.945));
+	}
+}
+
+rule("无缝E源氏2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 2;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 2);
+		Wait(0.100, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("交易大锤")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 4;
+		Global Variable(reset) == True;
+	}
+
+	actions
+	{
+		Respawn(Event Player);
+		Wait(0.250, Ignore Condition);
+		Teleport(Event Player, Vector(-0.445, 2.184, -7.208));
+		Start Throttle In Direction(Event Player, Direction Towards(Eye Position(Event Player), Players In Slot(3, Team 1)), 1, To World,
+			Replace existing throttle, Direction and Magnitude);
+		Wait(0.100, Ignore Condition);
+		Stop Throttle In Direction(Event Player);
+	}
+}
+
+rule("交易源氏")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 3;
+		Global Variable(reset) == True;
+	}
+
+	actions
+	{
+		Respawn(Event Player);
+		Wait(0.250, Ignore Condition);
+		Teleport(Event Player, Vector(0.125, 2.192, 7.290));
+		Wait(0.420, Ignore Condition);
+		Start Throttle In Direction(Event Player, Direction Towards(Eye Position(Event Player), Players In Slot(4, Team 2)), 1, To World,
+			Replace existing throttle, Direction and Magnitude);
+		Wait(0.100, Ignore Condition);
+		Stop Throttle In Direction(Event Player);
+	}
+}
+
+rule("刷无限e")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Global Variable(W) == True;
+		Player Variable(Event Player, Z) == 2;
+	}
+
+	actions
+	{
+		Wait(0.015, Ignore Condition);
+		Press Button(Event Player, Jump);
+		Set Facing(Event Player, Backward, To Player);
+		Loop If Condition Is True;
+	}
+}
+
+rule("无缝E开始")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 2;
+	}
+
+	actions
+	{
+		Wait(5, Ignore Condition);
+		Set Global Variable(W, True);
+		Wait(4, Ignore Condition);
+		Set Global Variable(W, False);
+		Wait(4, Ignore Condition);
+		Teleport(Event Player, Vector(-31.273, 12.373, 29.945));
+		Wait(0.250, Ignore Condition);
+		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Vector(-15.729, 2.199, 14.904)), To World);
+		Wait(1, Ignore Condition);
+		Stop Throttle In Direction(Event Player);
+		Set Global Variable(Y, True);
+	}
+}
+
+rule("二五仔行为")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, Z) == 5;
+		Is Dummy Bot(Event Player) == True;
+		Global Variable(Y) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 2);
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("二五仔")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, Z) == 5;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("二 五 仔", Null, Null, Null), Event Player, 2, Do Not Clip,
+			Visible To Position and String, White, Default Visibility);
+		Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Vector(-30.621, 12.418, 29.212)), 10000, To World,
+			Direction and Turn Rate);
+	}
+}
+
+rule("交易大锤")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 4;
+		Is Dead(Event Player) == False;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("交易锤", Null, Null, Null), Event Player, 2, Do Not Clip,
+			Visible To Position and String, White, Default Visibility);
+	}
+}
+
+rule("交易源氏")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 3;
+		Is Dead(Event Player) == False;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("交易源", Null, Null, Null), Event Player, 2, Do Not Clip,
+			Visible To Position and String, White, Default Visibility);
+	}
+}
+
+rule("二段飞天锤")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 1;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("二段飞天", Null, Null, Null), Event Player, 2, Do Not Clip,
+			Visible To Position and String, White, Default Visibility);
+	}
+}
+
+rule("飞天锤")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 2;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("飞天锤", Null, Null, Null), Event Player, 2, Do Not Clip,
+			Visible To Position and String, White, Default Visibility);
+	}
+}
+
+rule("瞬转源氏")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, Z) == 1;
+		Global Variable(reset) == True;
+		Is Dead(Event Player) == True;
+	}
+
+	actions
+	{
+		Respawn(Event Player);
+		Wait(0.250, Ignore Condition);
+		Teleport(Event Player, Vector(-45.852, 7.420, 6.540));
+		Wait(0.250, Ignore Condition);
+		Set Facing(Event Player, Forward, To World);
+	}
+}
+
+rule("重置监听")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0}申请重置！", Event Player, Null, Null));
+		Set Global Variable(reset, False);
+		Wait(0.250, Ignore Condition);
+		Set Global Variable(reset, True);
+		Wait(0.250, Ignore Condition);
+		Set Global Variable(reset, False);
+	}
+}
+
+rule("玩家穿越")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Phased Out, 9999);
+	}
+}

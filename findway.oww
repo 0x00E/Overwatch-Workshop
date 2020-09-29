@@ -1,0 +1,199 @@
+variables
+{
+	player:
+		26: stop
+}
+
+rule("Find way By：浅念#51206")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Stop Throttle In Direction(Event Player);
+		Stop Facing(Event Player);
+		Set Player Variable(Event Player, stop, Not(Player Variable(Event Player, stop)));
+		disabled Start Facing(Event Player, Forward, 100, To World, None);
+		disabled Wait(3, Ignore Condition);
+		disabled Start Facing(Event Player, Backward, 100, To World, None);
+	}
+}
+
+disabled rule("show ball")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Skip If(Compare(Value In Array(Global Variable(B), Add(Global Variable(D), 1)), ==, 0), 4);
+		Create Effect(All Players(All Teams), Sphere, Red, Value In Array(Global Variable(B), Global Variable(D)), Value In Array(
+			Global Variable(S), Global Variable(D)), Visible To);
+		Wait(0.250, Ignore Condition);
+		Modify Global Variable(D, Add, 1);
+		Loop If(Compare(Value In Array(Global Variable(B), Global Variable(D)), !=, 0));
+	}
+}
+
+rule("AI init")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Heroes(Hero(Mercy), All Teams) < 1;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Doomfist), All Teams, -1.000, Vector(0, 0, 0), Vector(0, 0, 0));
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("init var")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(B, Empty Array);
+		Set Global Variable(S, Empty Array);
+		Modify Global Variable(S, Append To Array, 8);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(S, Append To Array, 2);
+		Modify Global Variable(B, Append To Array, Vector(32.883, 13.443, -25.703));
+		Modify Global Variable(B, Append To Array, Vector(29, 13, -17.000));
+		Modify Global Variable(B, Append To Array, Vector(18.417, 13.017, -12.853));
+		Modify Global Variable(B, Append To Array, Vector(11.104, 17.863, -3.979));
+		Modify Global Variable(B, Append To Array, Vector(16.444, 18.423, 0.439));
+		Modify Global Variable(B, Append To Array, Vector(10.614, 18.423, 4.862));
+		Modify Global Variable(B, Append To Array, Vector(16.016, 18.423, 9.787));
+		Modify Global Variable(B, Append To Array, Vector(6.636, 14.062, 19.407));
+		Modify Global Variable(B, Append To Array, Vector(-0.133, 13.923, 5.690));
+		Modify Global Variable(B, Append To Array, Vector(4.229, 14.331, -3.762));
+		Modify Global Variable(B, Append To Array, Vector(11.454, 13.231, -15.217));
+		Modify Global Variable(B, Append To Array, Vector(28.047, 13.548, -27.340));
+	}
+}
+
+rule("find")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Skip If(Compare(Value In Array(Global Variable(B), Add(Player Variable(Event Player, C), 1)), ==, 0), 10);
+		Skip If(Compare(Player Variable(Event Player, stop), ==, True), 6);
+		Skip If(Compare(Distance Between(Event Player, Value In Array(Global Variable(B), Player Variable(Event Player, C))), >=,
+			Value In Array(Global Variable(S), Player Variable(Event Player, C))), 5);
+		Press Button(Event Player, Jump);
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player, Value In Array(Global Variable(B), Add(Player Variable(
+			Event Player, C), 1))), 1, To World, Replace existing throttle, None);
+		Stop Facing(Event Player);
+		Wait(0, Ignore Condition);
+		Start Facing(Event Player, Direction Towards(Event Player, Value In Array(Global Variable(B), Add(Player Variable(Event Player, C),
+			1))), 10000, To World, None);
+		Wait(0, Ignore Condition);
+		Modify Player Variable(Event Player, C, Add, 1);
+		Loop If(Compare(Value In Array(Global Variable(B), Player Variable(Event Player, C)), !=, 0));
+		Wait(0, Ignore Condition);
+		Set Player Variable(Event Player, C, 0);
+		Loop;
+	}
+}
+
+rule("spawn")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Value In Array(Global Variable(B), 0));
+	}
+}
+
+rule("player stop")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, stop, True);
+	}
+}
+
+disabled rule("AI phased out")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Phased Out, 9999);
+	}
+}

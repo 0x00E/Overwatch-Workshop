@@ -1,0 +1,163 @@
+variables
+{
+	player:
+		26: hit
+		27: slient
+		30: slienthud
+}
+
+rule("黑百合")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Widowmaker;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+		Is Firing Primary(Event Player) == True;
+		Player Variable(Event Player, slient) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, hit, Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), 1000), Eye Position(Event Player)), All Players(All Teams), Event Player, True));
+		Set Player Variable(Event Player, P, Sorted Array(Players Within Radius(Event Player, 1000, Opposite Team Of(Team Of(
+			Event Player)), Surfaces And Enemy Barriers), Distance Between(Player Variable(Event Player, hit), Current Array Element)));
+		Damage(Value In Array(Filtered Array(Player Variable(Event Player, P), Compare(Is Dead(Current Array Element), ==, False)), 0),
+			Event Player, 300);
+	}
+}
+
+rule("开关")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Destroy HUD Text(Player Variable(Event Player, slienthud));
+		Set Player Variable(Event Player, slient, Not(Player Variable(Event Player, slient)));
+		Skip If(Compare(Player Variable(Event Player, slient), ==, True), 1);
+		Create HUD Text(Event Player, Custom String("静默：关", Player Variable(Event Player, slient), Null, Null), Null, Null, Left, 0, White,
+			White, White, Visible To and String, Default Visibility);
+		Skip If(Compare(Player Variable(Event Player, slient), ==, False), 1);
+		Create HUD Text(Event Player, Custom String("静默：开", Player Variable(Event Player, slient), Null, Null), Null, Null, Left, 0, White,
+			White, White, Visible To and String, Default Visibility);
+		Set Player Variable(Event Player, slienthud, Last Text ID);
+	}
+}
+
+rule("初始化")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Destroy HUD Text(Player Variable(Event Player, slienthud));
+		Set Projectile Speed(Event Player, Multiply(9999999.000, 9999999.000));
+		Set Player Variable(Event Player, slient, False);
+		Create HUD Text(Event Player, Custom String("静默：关", Player Variable(Event Player, slient), Null, Null), Null, Null, Left, 0, White,
+			White, White, Visible To and String, Default Visibility);
+		Set Player Variable(Event Player, slienthud, Last Text ID);
+	}
+}
+
+rule("麦克雷")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		McCree;
+	}
+
+	conditions
+	{
+		Is Firing Primary(Event Player) == True;
+		Player Variable(Event Player, slient) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, hit, Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), 1000), Eye Position(Event Player)), All Players(All Teams), Event Player, True));
+		Set Player Variable(Event Player, P, Sorted Array(Players Within Radius(Event Player, 1000, Opposite Team Of(Team Of(
+			Event Player)), Surfaces And Enemy Barriers), Distance Between(Player Variable(Event Player, hit), Current Array Element)));
+		Damage(Value In Array(Filtered Array(Player Variable(Event Player, P), Compare(Is Dead(Current Array Element), ==, False)), 0),
+			Event Player, 140);
+	}
+}
+
+rule("半藏")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Hanzo;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, slient) == True;
+		Is Using Ability 2(Event Player) == False;
+		Is Button Held(Event Player, Primary Fire) == False;
+		Is Firing Secondary(Event Player) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, hit, Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), 1000), Eye Position(Event Player)), All Players(All Teams), Event Player, True));
+		Set Player Variable(Event Player, P, Sorted Array(Players Within Radius(Event Player, 1000, Opposite Team Of(Team Of(
+			Event Player)), Surfaces And Enemy Barriers), Distance Between(Player Variable(Event Player, hit), Current Array Element)));
+		Damage(Value In Array(Filtered Array(Player Variable(Event Player, P), Compare(Is Dead(Current Array Element), ==, False)), 0),
+			Event Player, 250);
+	}
+}
+
+rule("半藏E")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Hanzo;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Primary Fire) == True;
+		Player Variable(Event Player, slient) == True;
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, hit, Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), 1000), Eye Position(Event Player)), All Players(All Teams), Event Player, True));
+		Set Player Variable(Event Player, P, Sorted Array(Players Within Radius(Event Player, 1000, Opposite Team Of(Team Of(
+			Event Player)), Surfaces And Enemy Barriers), Distance Between(Player Variable(Event Player, hit), Current Array Element)));
+		Damage(Value In Array(Filtered Array(Player Variable(Event Player, P), Compare(Is Dead(Current Array Element), ==, False)), 0),
+			Event Player, 120);
+	}
+}

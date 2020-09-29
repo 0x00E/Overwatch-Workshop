@@ -1,0 +1,113 @@
+rule("作者：浅念#51206")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("REAPER")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(2, Ignore Condition);
+		Set Status(Event Player, Null, Frozen, 1);
+	}
+}
+
+rule("MCCREE")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		McCree;
+	}
+
+	conditions
+	{
+		Is Firing Primary(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, False);
+		Wait(0.350, Ignore Condition);
+		Set Primary Fire Enabled(Event Player, True);
+	}
+}
+
+rule("MCCREE #2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		McCree;
+	}
+
+	conditions
+	{
+		Is Firing Secondary(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player, 75);
+		Wait(1, Ignore Condition);
+		Set Damage Dealt(Event Player, 100);
+	}
+}
+
+rule("MERCY #2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mercy;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Resurrect(Player Closest To Reticle(Event Player, All Teams));
+		Set Status(Event Player, Null, Hacked, 0.001);
+	}
+}
+
+rule("DEBUG")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Slot 0;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Phased Out, 9999);
+	}
+}

@@ -1,0 +1,336 @@
+rule("Rule 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == False;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ultimate);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Rule 2")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Heroes(Hero(Brigitte), All Teams) < 1;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Brigitte), All Teams, -1.000, Vector(0, 0, 0), Vector(0, 0, 0));
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Rule 3")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+		Start Facing(Event Player, Direction Towards(Event Player, Closest Player To(Event Player, All Teams)), 10000, To World,
+			Direction and Turn Rate);
+		Start Throttle In Direction(Event Player, Direction Towards(Event Player, Closest Player To(Event Player, All Teams)), 1, To World,
+			Replace existing throttle, Direction and Magnitude);
+	}
+}
+
+rule("Rule 2")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Heroes(Hero(Genji), All Teams) < 1;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Genji), All Teams, -1.000, Vector(0, 0, 0), Vector(0, 0, 0));
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Rule 2")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Heroes(Hero(Reinhardt), All Teams) < 1;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Reinhardt), All Teams, -1.000, Vector(0, 0, 0), Vector(0, 0, 0));
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Rule 2")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Heroes(Hero(Torbjörn), All Teams) < 1;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Torbjörn), All Teams, -1.000, Vector(0, 0, 0), Vector(0, 0, 0));
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Rule 2")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Heroes(Hero(Winston), All Teams) < 1;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Winston), All Teams, -1.000, Vector(0, 0, 0), Vector(0, 0, 0));
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Rule 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Torbjörn;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == False;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 2);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Rule 9")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Respawn(Event Player);
+		Set Healing Dealt(Event Player, 0);
+		Set Healing Received(Event Player, 0);
+	}
+}
+
+rule("Rule 10")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Torbjörn;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, Divide(10, 3.500));
+		Heal(Event Player, Null, 10);
+	}
+}
+
+rule("Rule 11")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Jump);
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("Rule 10")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, 2);
+		Heal(Event Player, Null, 10);
+	}
+}
+
+rule("Rule 10")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Genji;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, 5);
+		Heal(Event Player, Null, 10);
+	}
+}
+
+rule("Rule 10")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, 4);
+		Heal(Event Player, Null, 10);
+	}
+}
+
+rule("Rule 10")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, 1);
+		Heal(Event Player, Null, 10);
+	}
+}
+
+rule("Rule 16")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player, 30);
+	}
+}

@@ -1,0 +1,345 @@
+rule("全局")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(Y, Empty Array);
+		Modify Global Variable(Y, Append To Array, Vector(-0.416, 95.498, 141.894));
+		Modify Global Variable(Y, Append To Array, Vector(-7.000, 96, 125));
+		Modify Global Variable(Y, Append To Array, Vector(0.283, 96.702, 131.862));
+		Set Global Variable(X, Empty Array);
+	}
+}
+
+rule("仓鼠球")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Filtered Array(Global Variable(X), Compare(Hero Of(Current Array Element), ==, Hero(Wrecking Ball)))) < 5;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Wrecking Ball), Team 2, -1.000, Value In Array(Global Variable(Y), 0), Forward);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("出生点")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		And(Is Alive(Event Player), Has Spawned(Event Player)) == True;
+		Is Dummy Bot(Event Player) == False;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(1.357, 95.446, 136.119));
+	}
+}
+
+rule("破坏球")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Wait(0.250, Ignore Condition);
+		Start Holding Button(Event Player, Secondary Fire);
+		Start Facing(Event Player, Direction Towards(Eye Position(Event Player), Vector(0, 96, 147)), 10000, To World,
+			Direction and Turn Rate);
+		Start Throttle In Direction(Event Player, Right, 1, To Player, Replace existing throttle, Direction and Magnitude);
+	}
+}
+
+rule("按F天使跳")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Stop Facing(Global Variable(A));
+		Wait(0.250, Ignore Condition);
+		Start Facing(Global Variable(A), Direction Towards(Eye Position(Global Variable(A)), Position Of(Event Player)), 10000, To World,
+			Direction and Turn Rate);
+		Start Holding Button(Global Variable(A), Ability 1);
+		Set Global Variable(T, Multiply(Distance Between(Position Of(Global Variable(A)), Position Of(Event Player)), 0.050));
+		Wait(Global Variable(T), Ignore Condition);
+		Stop Holding Button(Global Variable(A), Jump);
+		Start Holding Button(Global Variable(A), Jump);
+		Wait(0.250, Ignore Condition);
+		Stop Holding Button(Global Variable(A), Ability 1);
+		Destroy All HUD Text;
+		Wait(0.250, Ignore Condition);
+		Create HUD Text(All Players(All Teams), String("#{0}", Global Variable(T), Null, Null), Null, Null, Left, 0, White, White, White,
+			Visible To and String, Default Visibility);
+	}
+}
+
+rule("观战AI")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Communicating(Event Player, Need Healing) == True;
+	}
+
+	actions
+	{
+		Start Camera(Event Player, Eye Position(Global Variable(A)), Ray Cast Hit Position(Eye Position(Global Variable(A)), Add(Multiply(
+			Facing Direction Of(Global Variable(A)), Distance Between(Eye Position(Global Variable(A)), Position Of(Global Variable(A)))),
+			Eye Position(Global Variable(A))), All Players(All Teams), Global Variable(A), True), 10000);
+		Wait(10, Ignore Condition);
+		Stop Camera(Event Player);
+	}
+}
+
+rule("天使超级跳")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Filtered Array(Global Variable(X), Compare(Hero Of(Current Array Element), ==, Hero(Mercy)))) < 1;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Mercy), Team 1, -1.000, Value In Array(Global Variable(Y), 1), Left);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("天使出生点")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Mercy);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Value In Array(Global Variable(Y), 1));
+		Set Global Variable(A, Event Player);
+		Modify Global Variable(X, Append To Array, Event Player);
+	}
+}
+
+rule("破坏球出生点")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Value In Array(Global Variable(Y), 0));
+		Modify Global Variable(X, Append To Array, Event Player);
+	}
+}
+
+rule("DVA乱飞")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Filtered Array(Global Variable(X), Compare(Hero Of(Current Array Element), ==, Hero(D.Va)))) < 1;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(D.Va), Team 2, -1.000, Value In Array(Global Variable(Y), 2), Up);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("DVA")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(D.Va);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(X, Append To Array, Event Player);
+		Teleport(Event Player, Value In Array(Global Variable(Y), 2));
+		Set Aim Speed(Event Player, 10000);
+	}
+}
+
+rule("DVA")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(D.Va);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Ability 1);
+		Wait(2, Ignore Condition);
+		Stop Holding Button(Event Player, Ability 1);
+		Loop;
+	}
+}
+
+rule("Rule 13")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Phased Out, 9999);
+	}
+}
+
+rule("DVA")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(D.Va);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Up, 10000, To Player, Direction and Turn Rate);
+		Wait(0.100, Ignore Condition);
+		Start Facing(Event Player, Down, 10000, To Player, Direction and Turn Rate);
+		Wait(0.100, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("DVA")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Resurrect(Event Player);
+	}
+}

@@ -1,0 +1,421 @@
+variables
+{
+	global:
+		26: temp
+		27: number
+		30: fullNumber
+		31: dot
+		32: zero
+		33: zeroY
+}
+
+subroutines
+{
+	0: number
+	1: to
+}
+
+rule("全局")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Music;
+	}
+}
+
+rule("玩家选择英雄")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Has Spawned(Host Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Host Player, A, Vector(213.911, 28.698, -52.135));
+		Teleport(Host Player, Player Variable(Host Player, A));
+		Create HUD Text(All Players(All Teams), String("{0} {1}", Ray Cast Hit Position(Eye Position(Host Player), Add(Eye Position(
+			Host Player), Multiply(Facing Direction Of(Host Player), 1000)), All Players(All Teams), Host Player, True), String("", Null,
+			Null, Null), Null), Null, Null, Left, 0, White, White, White, Visible To and String, Default Visibility);
+	}
+}
+
+rule("UI布局")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(Y, Vector(213, 36, -65));
+		Create In-World Text(All Players(All Teams), String("{0} {1}", 0, String("", Null, Null, Null), Null), Global Variable(Y), 3,
+			Clip Against Surfaces, Visible To Position and String, White, Default Visibility);
+		Set Global Variable(Z, Last Text ID);
+		Set Global Variable(K, Vector(216, 32, -65));
+		Set Global Variable(L, Vector(216, 33, -65));
+		Set Global Variable(M, Vector(216, 34, -65));
+		Set Global Variable(N, Vector(216, 35, -65));
+		Set Global Variable(O, Vector(216, 36, -65));
+		Set Global Variable(number, Vector(213, 35, -65));
+		Modify Global Variable(number, Append To Array, Vector(214, 35, -65));
+		Modify Global Variable(number, Append To Array, Vector(215, 35, -65));
+		Modify Global Variable(number, Append To Array, Vector(213, 34, -65));
+		Modify Global Variable(number, Append To Array, Vector(214, 34, -65));
+		Modify Global Variable(number, Append To Array, Vector(215, 34, -65));
+		Modify Global Variable(number, Append To Array, Vector(213, 33, -65));
+		Modify Global Variable(number, Append To Array, Vector(214, 33, -65));
+		Modify Global Variable(number, Append To Array, Vector(215, 33, -65));
+		Modify Global Variable(number, Append To Array, Vector(213, 32, -65));
+		Modify Global Variable(number, Append To Array, Vector(214, 32, -65));
+		Modify Global Variable(number, Append To Array, Vector(213, 31, -65));
+	}
+}
+
+rule("构建UI")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create Effect(All Players(All Teams), Sphere, White, Global Variable(K), 0.500, Visible To Position and Radius);
+		Create In-World Text(All Players(All Teams), Custom String("=", Null, Null, Null), Add(Global Variable(K), Vector(0, -1, 0)), 2,
+			Clip Against Surfaces, Visible To Position and String, White, Default Visibility);
+		Create Effect(All Players(All Teams), Sphere, White, Global Variable(L), 0.500, Visible To Position and Radius);
+		Create In-World Text(All Players(All Teams), Custom String("+", Null, Null, Null), Add(Global Variable(L), Vector(0, -1, 0)), 2,
+			Clip Against Surfaces, Visible To Position and String, White, Default Visibility);
+		Create Effect(All Players(All Teams), Sphere, White, Global Variable(M), 0.500, Visible To Position and Radius);
+		Create In-World Text(All Players(All Teams), Custom String("-", Null, Null, Null), Add(Global Variable(M), Vector(0, -1, 0)), 2,
+			Clip Against Surfaces, Visible To Position and String, White, Default Visibility);
+		Create Effect(All Players(All Teams), Sphere, White, Global Variable(N), 0.500, Visible To Position and Radius);
+		Create In-World Text(All Players(All Teams), Custom String("x", Null, Null, Null), Add(Global Variable(N), Vector(0, -1, 0)), 2,
+			Clip Against Surfaces, Visible To Position and String, White, Default Visibility);
+		Create Effect(All Players(All Teams), Sphere, White, Global Variable(O), 0.500, Visible To Position and Radius);
+		Create In-World Text(All Players(All Teams), Custom String("/", Null, Null, Null), Add(Global Variable(O), Vector(0, -1, 0)), 2,
+			Clip Against Surfaces, Visible To Position and String, White, Default Visibility);
+		Create Effect(All Players(All Teams), Sphere, White, Global Variable(dot), 0.500, Visible To Position and Radius);
+		Create In-World Text(All Players(All Teams), Custom String(".", Null, Null, Null), Add(Global Variable(dot), Vector(0, -1, 0)), 2,
+			Clip Against Surfaces, Visible To Position and String, White, Default Visibility);
+	}
+}
+
+rule("等于")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Host Player, Interact) == True;
+		Distance Between(Global Variable(K), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), Distance Between(Eye Position(Event Player), Global Variable(K))), Eye Position(Event Player)), Null,
+			All Players(All Teams), False)) <= 0.500;
+	}
+
+	actions
+	{
+		Call Subroutine(to);
+		Set Player Variable(Event Player, Z, Null);
+	}
+}
+
+rule("加")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Host Player, Interact) == True;
+		Distance Between(Global Variable(L), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), Distance Between(Eye Position(Event Player), Global Variable(L))), Eye Position(Event Player)), Null,
+			All Players(All Teams), False)) <= 0.500;
+	}
+
+	actions
+	{
+		Call Subroutine(to);
+		Set Player Variable(Event Player, Z, 1);
+		Play Effect(All Players(All Teams), Explosion Sound, White, Host Player, 10000);
+	}
+}
+
+rule("减")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Host Player, Interact) == True;
+		Distance Between(Global Variable(M), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), Distance Between(Eye Position(Event Player), Global Variable(M))), Eye Position(Event Player)), Null,
+			All Players(All Teams), False)) <= 0.500;
+	}
+
+	actions
+	{
+		Call Subroutine(to);
+		Set Player Variable(Event Player, Z, 2);
+		Play Effect(All Players(All Teams), Explosion Sound, White, Host Player, 10000);
+	}
+}
+
+rule("乘")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Host Player, Interact) == True;
+		Distance Between(Global Variable(N), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), Distance Between(Eye Position(Event Player), Global Variable(N))), Eye Position(Event Player)), Null,
+			All Players(All Teams), False)) <= 0.500;
+	}
+
+	actions
+	{
+		Call Subroutine(to);
+		Set Player Variable(Event Player, Z, 3);
+		Play Effect(All Players(All Teams), Explosion Sound, White, Host Player, 10000);
+	}
+}
+
+rule("除")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Host Player, Interact) == True;
+		Distance Between(Global Variable(O), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), Distance Between(Eye Position(Event Player), Global Variable(O))), Eye Position(Event Player)), Null,
+			All Players(All Teams), False)) <= 0.500;
+	}
+
+	actions
+	{
+		Call Subroutine(to);
+		Set Player Variable(Event Player, Z, 4);
+		Play Effect(All Players(All Teams), Explosion Sound, White, Host Player, 10000);
+	}
+}
+
+rule("数字函数")
+{
+	event
+	{
+		Subroutine;
+		number;
+	}
+
+	actions
+	{
+		If(Compare(Global Variable(temp), ==, 0));
+			If(Compare(Global Variable(dot), ==, Null));
+				If(Or(Compare(Player Variable(Event Player, X), ==, Null), Compare(Player Variable(Event Player, Z), ==, Null)));
+					Set Global Variable(zero, True);
+				Else;
+					Set Global Variable(zeroY, True);
+				End;
+			End;
+		End;
+		If(Compare(Global Variable(temp), <=, 9));
+			If(Compare(Global Variable(dot), !=, Null));
+				Skip If(Compare(Global Variable(dot), !=, 0.010), 1);
+				Abort;
+				Set Global Variable(dot, Multiply(Global Variable(dot), 0.100));
+				If(Or(Compare(Player Variable(Event Player, X), ==, Null), Compare(Player Variable(Event Player, Z), ==, Null)));
+					Set Global Variable(fullNumber, Add(Player Variable(Event Player, X), Multiply(Global Variable(temp), Global Variable(dot))));
+				Else;
+					Set Global Variable(fullNumber, Add(Player Variable(Event Player, Y), Multiply(Global Variable(temp), Global Variable(dot))));
+				End;
+			Else;
+				If(Or(Compare(Player Variable(Event Player, X), ==, Null), Compare(Player Variable(Event Player, Z), ==, Null)));
+					Skip If(Compare(Player Variable(Event Player, X), ==, 0), 1);
+					Set Global Variable(zero, Null);
+					Set Global Variable(fullNumber, Add(Multiply(Player Variable(Event Player, X), 10), Global Variable(temp)));
+				Else;
+					Skip If(Compare(Player Variable(Event Player, Y), ==, 0), 1);
+					Set Global Variable(zeroY, Null);
+					Set Global Variable(fullNumber, Add(Multiply(Player Variable(Event Player, Y), 10), Global Variable(temp)));
+				End;
+			End;
+		End;
+		Skip If(Compare(Global Variable(temp), !=, 12), 7);
+		Set Player Variable(Event Player, X, 0);
+		Set Player Variable(Event Player, Y, 0);
+		Set Player Variable(Event Player, Z, 0);
+		Set Global Variable(fullNumber, 0);
+		Set Global Variable(dot, Null);
+		Set Global Variable(zeroY, Null);
+		Set Global Variable(zero, Null);
+		Destroy In-World Text(Global Variable(Z));
+		If(Compare(Global Variable(temp), ==, 11));
+			Set Global Variable(dot, 1);
+			Create In-World Text(All Players(All Teams), Custom String("{0}.", Global Variable(fullNumber), Null, Null), Global Variable(Y), 3,
+				Clip Against Surfaces, Visible To Position and String, White, Default Visibility);
+		Else;
+			Create In-World Text(All Players(All Teams), Custom String("{0}", Global Variable(fullNumber), Null, Null), Global Variable(Y), 3,
+				Clip Against Surfaces, Visible To Position and String, White, Default Visibility);
+		End;
+		Set Global Variable(Z, Last Text ID);
+		Play Effect(All Players(All Teams), Explosion Sound, White, Host Player, 10000);
+		If(Or(And(Compare(Player Variable(Event Player, X), ==, Null), Compare(Global Variable(zero), !=, True)), Compare(Player Variable(
+			Event Player, Z), ==, Null)));
+			Set Player Variable(Event Player, X, Global Variable(fullNumber));
+		Else;
+			Set Player Variable(Event Player, Y, Global Variable(fullNumber));
+		End;
+	}
+}
+
+rule("等于函数")
+{
+	event
+	{
+		Subroutine;
+		to;
+	}
+
+	actions
+	{
+		Destroy In-World Text(Global Variable(Z));
+		Skip If(And(Compare(Player Variable(Event Player, Y), ==, 0), And(Compare(Global Variable(zero), ==, Null), Compare(
+			Global Variable(zeroY), ==, Null))), 12);
+		If(Compare(Player Variable(Event Player, Z), ==, 1));
+			Set Player Variable(Event Player, X, Add(Player Variable(Event Player, X), Player Variable(Event Player, Y)));
+		Else If(Compare(Player Variable(Event Player, Z), ==, 2));
+			Set Player Variable(Event Player, X, Subtract(Player Variable(Event Player, X), Player Variable(Event Player, Y)));
+		Else If(Compare(Player Variable(Event Player, Z), ==, 3));
+			Set Player Variable(Event Player, X, Multiply(Player Variable(Event Player, X), Player Variable(Event Player, Y)));
+		Else If(Compare(Player Variable(Event Player, Z), ==, 4));
+			Set Player Variable(Event Player, X, Divide(Player Variable(Event Player, X), Player Variable(Event Player, Y)));
+		End;
+		If(And(Compare(Player Variable(Event Player, Z), ==, 3), Or(Compare(Player Variable(Event Player, X), ==, 0), Compare(
+			Player Variable(Event Player, Y), ==, 0))));
+			Set Player Variable(Event Player, X, 0);
+		End;
+		If(And(Compare(Player Variable(Event Player, Z), ==, 4), Compare(Player Variable(Event Player, Y), ==, 0)));
+			Create In-World Text(All Players(All Teams), Custom String("∞", Null, Null, Null), Global Variable(Y), 3, Clip Against Surfaces,
+				Visible To Position and String, White, Default Visibility);
+		Else;
+			Create In-World Text(All Players(All Teams), String("{0} {1}", Player Variable(Event Player, X), Custom String("", Null, Null,
+				Null), Null), Global Variable(Y), 3, Clip Against Surfaces, Visible To Position and String, White, Default Visibility);
+		End;
+		Set Global Variable(Z, Last Text ID);
+		Play Effect(All Players(All Teams), Explosion Sound, White, Host Player, 10000);
+		Set Player Variable(Event Player, Y, Null);
+		Set Global Variable(dot, Null);
+	}
+}
+
+rule("数字")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Host Player, Interact) == True;
+		Distance Between(Global Variable(A), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(Facing Direction Of(
+			Event Player), Distance Between(Eye Position(Event Player), Global Variable(A))), Eye Position(Event Player)), Null,
+			All Players(All Teams), False)) <= 0.500;
+	}
+
+	actions
+	{
+		For Global Variable(temp, 0, Count Of(Global Variable(number)), 1);
+			Skip If(Compare(Distance Between(Value In Array(Global Variable(number), Global Variable(temp)), Ray Cast Hit Position(
+				Eye Position(Event Player), Add(Multiply(Facing Direction Of(Event Player), Distance Between(Eye Position(Event Player),
+				Value In Array(Global Variable(number), Global Variable(temp)))), Eye Position(Event Player)), All Players(All Teams),
+				Event Player, True)), >, 0.500), 6);
+			Set Global Variable(temp, Add(Global Variable(temp), 1));
+			If(Compare(Global Variable(temp), ==, 10));
+				Set Global Variable(temp, 0);
+			End;
+			Call Subroutine(number);
+			Abort;
+		End;
+	}
+}
+
+rule("布局")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		For Global Variable(temp, 0, Count Of(Global Variable(number)), 1);
+			Create Effect(All Players(All Teams), Sphere, White, Value In Array(Global Variable(number), Global Variable(temp)), 0.500,
+				Visible To);
+		End;
+		Create In-World Text(All Players(All Teams), Custom String("1", Null, Null, Null), Add(Value In Array(Global Variable(number), 0),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("2", Null, Null, Null), Add(Value In Array(Global Variable(number), 1),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("3", Null, Null, Null), Add(Value In Array(Global Variable(number), 2),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("4", Null, Null, Null), Add(Value In Array(Global Variable(number), 3),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("5", Null, Null, Null), Add(Value In Array(Global Variable(number), 4),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("6", Null, Null, Null), Add(Value In Array(Global Variable(number), 5),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("7", Null, Null, Null), Add(Value In Array(Global Variable(number), 6),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("8", Null, Null, Null), Add(Value In Array(Global Variable(number), 7),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("9", Null, Null, Null), Add(Value In Array(Global Variable(number), 8),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("0", Null, Null, Null), Add(Value In Array(Global Variable(number), 9),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String(".", Null, Null, Null), Add(Value In Array(Global Variable(number), 10),
+			Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("AC", Null, Null, Null), Add(Value In Array(Global Variable(number),
+			11), Vector(0, -1, 0)), 2, Clip Against Surfaces, Visible To and String, White, Default Visibility);
+	}
+}

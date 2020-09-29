@@ -1,0 +1,21 @@
+rule("Rule 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Jump) == True;
+	}
+
+	actions
+	{
+		Disallow Button(Event Player, Jump);
+		Wait(0.250, Ignore Condition);
+		Allow Button(Event Player, Jump);
+	}
+}

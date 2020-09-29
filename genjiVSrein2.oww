@@ -1,0 +1,1712 @@
+rule("源氏VS大锤人机版2.0          作者：浅念#51206        测试：路人眼里只剩黑白#5675")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Destroy All HUD Text;
+		Disable Built-In Game Mode Completion;
+		Disable Built-In Game Mode Respawning(All Players(Team 2));
+		Set Global Variable(O, 0);
+		Set Global Variable(M, 1);
+		Set Global Variable(N, 6);
+		Set Global Variable(D, 0);
+		Set Global Variable At Index(Z, 0, Vector(-20.547, 13.908, -0.226));
+		Set Global Variable At Index(Z, 1, Vector(1.764, 12.903, -16.114));
+		Set Global Variable At Index(Z, 2, Vector(-0.774, 2.210, -12.030));
+		Set Global Variable At Index(Z, 3, Vector(23.522, 5.973, -0.043));
+		Set Global Variable At Index(Z, 4, Vector(6.080, 11.219, 28.359));
+		Set Global Variable At Index(Z, 5, Vector(-30.818, 5.966, 27.134));
+		Set Global Variable At Index(V, 98, 5);
+		Set Global Variable At Index(V, 10, 0);
+		Set Global Variable At Index(V, 30, Empty Array);
+		Set Global Variable At Index(V, 90, 1);
+		Set Global Variable At Index(V, 91, 1);
+	}
+}
+
+rule("锁定按钮")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Distance Between(Value In Array(Global Variable(E), 6), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(
+			Facing Direction Of(Event Player), Distance Between(Eye Position(Event Player), Value In Array(Global Variable(E), 6))),
+			Eye Position(Event Player)), Null, All Players(All Teams), False)) <= 0.300;
+		Is Button Held(Event Player, Primary Fire) == True;
+		Is Dummy Bot(Event Player) == False;
+		Value In Array(Global Variable(V), 92) == 0;
+	}
+
+	actions
+	{
+		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Event Player, 10000);
+		Play Effect(All Players(All Teams), Bad Pickup Effect, White, Value In Array(Global Variable(E), 6), 1);
+		Destroy In-World Text(Value In Array(Global Variable(V), 200));
+		Wait(0.250, Ignore Condition);
+		Set Global Variable At Index(V, 92, 1);
+		Create In-World Text(All Players(All Teams), Custom String("锁定", Null, Null, Null), Subtract(Value In Array(Global Variable(E), 6),
+			Vector(0, 0.250, 0)), 1.500, Clip Against Surfaces, Visible To Position and String, Red, Default Visibility);
+		Set Global Variable At Index(V, 200, Last Text ID);
+	}
+}
+
+rule("解锁按钮")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Distance Between(Value In Array(Global Variable(E), 6), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(
+			Facing Direction Of(Event Player), Distance Between(Eye Position(Event Player), Value In Array(Global Variable(E), 6))),
+			Eye Position(Event Player)), Null, All Players(All Teams), False)) <= 0.300;
+		Is Button Held(Event Player, Primary Fire) == True;
+		Is Dummy Bot(Event Player) == False;
+		Value In Array(Global Variable(V), 92) == 1;
+	}
+
+	actions
+	{
+		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Event Player, 10000);
+		Play Effect(All Players(All Teams), Bad Pickup Effect, White, Value In Array(Global Variable(E), 6), 1);
+		Destroy In-World Text(Value In Array(Global Variable(V), 200));
+		Wait(0.250, Ignore Condition);
+		Set Global Variable At Index(V, 92, 0);
+		Create In-World Text(All Players(All Teams), Custom String("解锁", Null, Null, Null), Subtract(Value In Array(Global Variable(E), 6),
+			Vector(0, 0.250, 0)), 1.500, Clip Against Surfaces, Visible To Position and String, Green, Default Visibility);
+		Set Global Variable At Index(V, 200, Last Text ID);
+	}
+}
+
+rule("血量1按钮")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Value In Array(Global Variable(E), 3), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(
+			Facing Direction Of(Event Player), Distance Between(Eye Position(Event Player), Value In Array(Global Variable(E), 3))),
+			Eye Position(Event Player)), Null, All Players(All Teams), False)) <= 0.300;
+		Is Button Held(Event Player, Primary Fire) == True;
+		Is Dummy Bot(Event Player) == False;
+		Or(Compare(Value In Array(Global Variable(V), 92), !=, 1), Compare(Event Player, ==, Host Player)) == True;
+	}
+
+	actions
+	{
+		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Event Player, 10000);
+		Play Effect(All Players(All Teams), Ring Explosion, Yellow, Value In Array(Global Variable(E), 3), 1);
+		Set Global Variable At Index(V, 91, 1);
+	}
+}
+
+rule("血量2按钮")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Value In Array(Global Variable(E), 4), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(
+			Facing Direction Of(Event Player), Distance Between(Eye Position(Event Player), Value In Array(Global Variable(E), 4))),
+			Eye Position(Event Player)), Null, All Players(All Teams), False)) <= 0.300;
+		Is Button Held(Event Player, Primary Fire) == True;
+		Is Dummy Bot(Event Player) == False;
+		Or(Compare(Value In Array(Global Variable(V), 92), !=, 1), Compare(Event Player, ==, Host Player)) == True;
+	}
+
+	actions
+	{
+		Play Effect(All Players(All Teams), Buff Explosion Sound, White, Event Player, 10000);
+		Play Effect(All Players(All Teams), Bad Explosion, Green, Value In Array(Global Variable(E), 4), 1);
+		Set Global Variable At Index(V, 91, 2);
+	}
+}
+
+rule("按钮")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Value In Array(Global Variable(E), 5), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(
+			Facing Direction Of(Event Player), Distance Between(Eye Position(Event Player), Value In Array(Global Variable(E), 5))),
+			Eye Position(Event Player)), Null, All Players(All Teams), False)) <= 0.300;
+		Is Button Held(Event Player, Primary Fire) == True;
+		Is Dummy Bot(Event Player) == False;
+		Or(Compare(Value In Array(Global Variable(V), 92), !=, 1), Compare(Event Player, ==, Host Player)) == True;
+	}
+
+	actions
+	{
+		Play Effect(All Players(All Teams), Debuff Impact Sound, White, Event Player, 10000);
+		Play Effect(All Players(All Teams), Good Explosion, Red, Value In Array(Global Variable(E), 5), 3);
+		Set Global Variable At Index(V, 91, 3);
+	}
+}
+
+rule("血量1")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(V), 91) == 1;
+	}
+
+	actions
+	{
+		Set Global Variable At Index(V, 111, 0.500);
+		Set Global Variable At Index(V, 112, 0.200);
+		Set Damage Received(All Players(Team 1), Value In Array(Global Variable(V), 111));
+		Set Max Health(All Players(Team 1), Value In Array(Global Variable(V), 112));
+		Wait(0.250, Ignore Condition);
+		Resurrect(Filtered Array(All Players(Team 1), Compare(Health(Current Array Element), >, 0)));
+	}
+}
+
+rule("血量2")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(V), 91) == 2;
+	}
+
+	actions
+	{
+		Set Global Variable At Index(V, 111, 2);
+		Set Global Variable At Index(V, 112, 0.200);
+		Set Damage Received(All Players(Team 1), Value In Array(Global Variable(V), 111));
+		Set Max Health(All Players(Team 1), Value In Array(Global Variable(V), 112));
+		Wait(0.250, Ignore Condition);
+		Resurrect(Filtered Array(All Players(Team 1), Compare(Health(Current Array Element), >, 0)));
+	}
+}
+
+rule("血量3")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(V), 91) == 3;
+	}
+
+	actions
+	{
+		Set Global Variable At Index(V, 111, Multiply(9999999.000, 9999999.000));
+		Set Global Variable At Index(V, 112, 250);
+		Set Damage Received(All Players(Team 1), Value In Array(Global Variable(V), 111));
+		Set Max Health(All Players(Team 1), Value In Array(Global Variable(V), 112));
+		Wait(0.250, Ignore Condition);
+		Resurrect(Filtered Array(All Players(Team 1), Compare(Health(Current Array Element), >, 0)));
+	}
+}
+
+rule("UI")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("难度：等级{0}/容错{1}", Value In Array(Global Variable(V), 90),
+			Value In Array(Global Variable(V), 91), Null), Vector(1, 6.500, 20), 3, Clip Against Surfaces, Visible To Position and String,
+			Yellow, Default Visibility);
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(0, 5, 20));
+		Modify Global Variable(E, Append To Array, Vector(1, 5, 20));
+		Modify Global Variable(E, Append To Array, Vector(2, 5, 20));
+		Create Effect(All Players(All Teams), Sphere, Yellow, Value In Array(Global Variable(E), 0), 0.300,
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Green, Value In Array(Global Variable(E), 1), 0.300, Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Red, Value In Array(Global Variable(E), 2), 0.300, Visible To Position and Radius);
+		Modify Global Variable(E, Append To Array, Vector(0, 4, 20));
+		Modify Global Variable(E, Append To Array, Vector(1, 4, 20));
+		Modify Global Variable(E, Append To Array, Vector(2, 4, 20));
+		Create Effect(All Players(All Teams), Sphere, Sky Blue, Value In Array(Global Variable(E), 3), 0.300,
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Aqua, Value In Array(Global Variable(E), 4), 0.300, Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Purple, Value In Array(Global Variable(E), 5), 0.300,
+			Visible To Position and Radius);
+		Modify Global Variable(E, Append To Array, Vector(1, 6, 20));
+		Create Effect(All Players(All Teams), Sphere, White, Value In Array(Global Variable(E), 6), 0.300, Visible To Position and Radius);
+		Create In-World Text(All Players(All Teams), Custom String("锁定", Null, Null, Null), Subtract(Value In Array(Global Variable(E), 6),
+			Vector(0, 0.250, 0)), 1.500, Clip Against Surfaces, Visible To Position and String, Red, Default Visibility);
+		Set Global Variable At Index(V, 200, Last Text ID);
+		Set Global Variable At Index(V, 92, 1);
+	}
+}
+
+rule("难度1")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(V), 90) == 1;
+	}
+
+	actions
+	{
+		Set Global Variable At Index(V, 100, 1.500);
+		Set Global Variable At Index(V, 101, 3);
+		Set Global Variable At Index(V, 102, 250);
+		Set Global Variable At Index(V, 103, 100);
+		Set Global Variable At Index(V, 104, 130);
+		Set Global Variable At Index(V, 105, 130);
+		Set Global Variable At Index(V, 106, 100);
+		Set Global Variable At Index(V, 110, 130);
+		Set Aim Speed(All Players(Team 2), Value In Array(Global Variable(V), 103));
+		Set Move Speed(All Players(Team 2), Value In Array(Global Variable(V), 104));
+		Set Projectile Speed(All Players(Team 2), Value In Array(Global Variable(V), 105));
+		Set Move Speed(All Players(Team 1), Value In Array(Global Variable(V), 110));
+		disabled Set Player Variable(All Players(Team 2), N, 1);
+		disabled Wait(0.250, Ignore Condition);
+		disabled Set Player Variable(All Players(Team 2), N, 0);
+		Set Damage Received(All Players(Team 2), Value In Array(Global Variable(V), 102));
+	}
+}
+
+rule("难度2")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(V), 90) == 2;
+	}
+
+	actions
+	{
+		Set Global Variable At Index(V, 100, 1);
+		Set Global Variable At Index(V, 101, 2);
+		Set Global Variable At Index(V, 102, 220);
+		Set Global Variable At Index(V, 103, 150);
+		Set Global Variable At Index(V, 104, 140);
+		Set Global Variable At Index(V, 105, 140);
+		Set Global Variable At Index(V, 106, 1000);
+		Set Global Variable At Index(V, 110, 140);
+		Set Aim Speed(All Players(Team 2), Value In Array(Global Variable(V), 103));
+		Set Move Speed(All Players(Team 2), Value In Array(Global Variable(V), 104));
+		Set Projectile Speed(All Players(Team 2), Value In Array(Global Variable(V), 105));
+		Set Move Speed(All Players(Team 1), Value In Array(Global Variable(V), 110));
+		disabled Set Player Variable(All Players(Team 2), N, 1);
+		disabled Wait(0.250, Ignore Condition);
+		disabled Set Player Variable(All Players(Team 2), N, 0);
+		Set Damage Received(All Players(Team 2), Value In Array(Global Variable(V), 102));
+	}
+}
+
+rule("难度3")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(V), 90) == 3;
+	}
+
+	actions
+	{
+		Set Global Variable At Index(V, 100, 0.500);
+		Set Global Variable At Index(V, 101, 1);
+		Set Global Variable At Index(V, 102, 100);
+		Set Global Variable At Index(V, 103, 10000);
+		Set Global Variable At Index(V, 104, 180);
+		Set Global Variable At Index(V, 105, 10000);
+		Set Global Variable At Index(V, 106, 10000);
+		Set Global Variable At Index(V, 110, 100);
+		Set Aim Speed(All Players(Team 2), Value In Array(Global Variable(V), 103));
+		Set Move Speed(All Players(Team 2), Value In Array(Global Variable(V), 104));
+		disabled Set Player Variable(All Players(Team 2), N, 1);
+		disabled Wait(0.250, Ignore Condition);
+		disabled Set Player Variable(All Players(Team 2), N, 0);
+		Set Projectile Speed(All Players(Team 2), Value In Array(Global Variable(V), 105));
+		Set Move Speed(All Players(Team 1), Value In Array(Global Variable(V), 110));
+		Set Damage Received(All Players(Team 2), Value In Array(Global Variable(V), 102));
+	}
+}
+
+rule("难度1按钮")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Value In Array(Global Variable(E), 0), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(
+			Facing Direction Of(Event Player), Distance Between(Eye Position(Event Player), Value In Array(Global Variable(E), 0))),
+			Eye Position(Event Player)), Null, All Players(All Teams), False)) <= 0.300;
+		Is Button Held(Event Player, Primary Fire) == True;
+		Is Dummy Bot(Event Player) == False;
+		Or(Compare(Value In Array(Global Variable(V), 92), !=, 1), Compare(Event Player, ==, Host Player)) == True;
+	}
+
+	actions
+	{
+		Set Global Variable At Index(V, 90, 1);
+		Play Effect(All Players(All Teams), Ring Explosion Sound, White, Event Player, 10000);
+		Play Effect(All Players(All Teams), Ring Explosion, Yellow, Value In Array(Global Variable(E), 0), 1);
+	}
+}
+
+rule("难度2按钮")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Value In Array(Global Variable(E), 1), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(
+			Facing Direction Of(Event Player), Distance Between(Eye Position(Event Player), Value In Array(Global Variable(E), 1))),
+			Eye Position(Event Player)), Null, All Players(All Teams), False)) <= 0.300;
+		Is Button Held(Event Player, Primary Fire) == True;
+		Is Dummy Bot(Event Player) == False;
+		Or(Compare(Value In Array(Global Variable(V), 92), !=, 1), Compare(Event Player, ==, Host Player)) == True;
+	}
+
+	actions
+	{
+		Set Global Variable At Index(V, 90, 2);
+		Play Effect(All Players(All Teams), Buff Explosion Sound, White, Event Player, 10000);
+		Play Effect(All Players(All Teams), Bad Explosion, Green, Value In Array(Global Variable(E), 1), 1);
+	}
+}
+
+rule("难度3按钮")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Value In Array(Global Variable(E), 2), Ray Cast Hit Position(Eye Position(Event Player), Add(Multiply(
+			Facing Direction Of(Event Player), Distance Between(Eye Position(Event Player), Value In Array(Global Variable(E), 2))),
+			Eye Position(Event Player)), Null, All Players(All Teams), False)) <= 0.300;
+		Is Button Held(Event Player, Primary Fire) == True;
+		Is Dummy Bot(Event Player) == False;
+		Or(Compare(Value In Array(Global Variable(V), 92), !=, 1), Compare(Event Player, ==, Host Player)) == True;
+	}
+
+	actions
+	{
+		Set Global Variable At Index(V, 90, 3);
+		Play Effect(All Players(All Teams), Debuff Impact Sound, White, Event Player, 10000);
+		Play Effect(All Players(All Teams), Good Explosion, Red, Value In Array(Global Variable(E), 2), 3);
+	}
+}
+
+disabled rule("通用HUD")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create HUD Text(All Players(All Teams), Custom String("源氏VS大锤人机版2.0", Null, Null, Null), Null, Null, Right, 0, Yellow, White,
+			White, Visible To and String, Default Visibility);
+	}
+}
+
+disabled rule("队友HUD 队伍1设置为：<TX")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, U) == False;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(5, Ignore Condition);
+		Create HUD Text(All Players(All Teams), String("{0} {1}", Team 1, Team 2, Null), Hero Icon String(Hero(Genji)), Event Player, Left,
+			0, Blue, Orange, Blue, Visible To and String, Default Visibility);
+		Set Player Variable(Event Player, U, True);
+		disabled Create HUD Text(All Players(All Teams), String("{0} {1}", Team 1, Team 2, Null), Hero Icon String(Hero(Reinhardt)), String("Enemy",
+			Null, Null, Null), Right, 0, Red, Orange, Yellow, Visible To and String, Default Visibility);
+		disabled Set Global Variable(Y, Last Text ID);
+		disabled Create HUD Text(All Players(All Teams), String("{0}:{1}", String("Time", Null, Null, Null), Match Time, Null), Null, Null, Right,
+			0, Lime Green, White, White, Visible To and String, Default Visibility);
+		disabled Create HUD Text(All Players(All Teams), String("Round {0}", Match Round, Null, Null), Null, Null, Left, 0, Sky Blue, White, White,
+			Visible To and String, Default Visibility);
+	}
+}
+
+disabled rule("敌人HUD 队伍2设置为：C0000000000A4EB")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, U) == False;
+	}
+
+	actions
+	{
+		Wait(5, Ignore Condition);
+		Create HUD Text(All Players(All Teams), String("{0} {1}", Team 1, Team 2, Null), Hero Icon String(Hero(Reinhardt)), Event Player,
+			Right, 0, Red, Orange, Red, Visible To and String, Default Visibility);
+		Set Player Variable(Event Player, U, True);
+	}
+}
+
+disabled rule("[DEBUG] 多人")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Heroes(Hero(Genji), Team 1) != Value In Array(Global Variable(V), 98);
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Genji), Team 1, -1.000, Vector(10000, 10000, 10000), Vector(0, 0, 0));
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("[DEBUG] 空气墙")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Phased Out, 9999);
+	}
+}
+
+disabled rule("[DEBUG] 测试AI")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(N, 2);
+		disabled Create HUD Text(All Players(All Teams), String("#{0}", Point Capture Percentage, Null, Null), Null, Null, Left, 0, White, White,
+			White, Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), String("{0} - {1} - {2}", Number of Dead Players(All Teams), All Dead Players(Team 1),
+			Number of Players(Team 1)), Null, Null, Left, 0, White, White, White, Visible To and String, Default Visibility);
+		Set Global Variable(D, 1);
+		Disable Built-In Game Mode Music;
+	}
+}
+
+disabled rule("[DEBUG] 回合")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create HUD Text(All Players(All Teams), String("{0} - {1} - {2}", Global Variable(O), Global Variable(J), Match Round), Null, Null,
+			Left, 0, White, White, White, Visible To and String, Default Visibility);
+	}
+}
+
+disabled rule("[DEBUG] 存活玩家数")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create HUD Text(All Players(All Teams), String("{0} - {1} - {2}", Value In Array(Global Variable(V), 10), Number of Players(
+			Team 1), Value In Array(Global Variable(V), 11)), Null, Null, Left, 0, White, White, White, Visible To and String,
+			Default Visibility);
+		Wait(0.250, Ignore Condition);
+		Destroy HUD Text(Last Text ID);
+		Loop;
+	}
+}
+
+disabled rule("[DEBUG] 大锤出生点")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Create HUD Text(All Players(All Teams), String("{0} - {1} - {2}", Slot Of(Event Player), Null, Null), Null, Null, Left, 0, White,
+			White, White, Visible To and String, Default Visibility);
+	}
+}
+
+rule("源氏初始化")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, Value In Array(Global Variable(V), 111));
+		Set Max Health(Event Player, Value In Array(Global Variable(V), 112));
+		Wait(0.250, Ignore Condition);
+		Resurrect(Event Player);
+	}
+}
+
+rule("大锤初始化")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Aim Speed(Event Player, Value In Array(Global Variable(V), 103));
+		Set Move Speed(Event Player, Value In Array(Global Variable(V), 104));
+		Set Projectile Speed(Event Player, Value In Array(Global Variable(V), 105));
+	}
+}
+
+rule("常量")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Set Player Variable At Index(Event Player, V, 0, 1);
+		Set Player Variable At Index(Event Player, V, 1, 1);
+		Set Player Variable At Index(Event Player, V, 2, 1);
+		Set Player Variable At Index(Event Player, V, 3, 1);
+		Set Player Variable At Index(Event Player, V, 4, 1);
+	}
+}
+
+rule("生成大锤")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Heroes(Hero(Reinhardt), Team 2) != Global Variable(N);
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Reinhardt), Team 2, -1.000, Global Variable(Z), Vector(0, 0, 0));
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("移动")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Player Variable(Event Player, C) != 1;
+		Player Variable(Event Player, N) != 1;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Direction Towards(Position Of(Event Player), Position Of(Player Variable(Event Player,
+			P))), 1, To Player, Replace existing throttle, Direction and Magnitude);
+		Wait(0.100, Ignore Condition);
+	}
+}
+
+rule("朝向")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Player Variable(Event Player, N) != 1;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Direction Towards(Position Of(Event Player), Position Of(Player Variable(Event Player, P))),
+			Value In Array(Global Variable(V), 106), To World, Direction and Turn Rate);
+	}
+}
+
+rule("游戏未开启无限复活")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Game In Progress == False;
+	}
+
+	actions
+	{
+		Resurrect(Event Player);
+		Teleport(Event Player, Global Variable(Z));
+	}
+}
+
+rule("一直轮锤")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Skip If(Compare(Value In Array(Player Variable(Event Player, V), 0), !=, 1), 1);
+		Press Button(Event Player, Primary Fire);
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("E")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Skip If(Compare(Add(Y Component Of(Position Of(Event Player)), 10), >, Y Component Of(Position Of(Closest Player To(Event Player,
+			Team 1)))), 3);
+		Skip If(Compare(Value In Array(Player Variable(Event Player, V), 1), !=, 1), 2);
+		Skip If(Is Using Ability 2(Closest Player To(Event Player, Team 1)), 1);
+		Press Button(Event Player, Ability 2);
+		Wait(Value In Array(Global Variable(V), 100), Ignore Condition);
+		Loop;
+	}
+}
+
+rule("Shift")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Global Variable(C) != 1;
+	}
+
+	actions
+	{
+		Skip If(Compare(Value In Array(Player Variable(Event Player, V), 2), !=, 1), 1);
+		Press Button(Event Player, Ability 1);
+		Wait(Value In Array(Global Variable(V), 101), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("跳")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Skip If(Compare(Value In Array(Player Variable(Event Player, V), 3), !=, 1), 2);
+		Skip If(Or(Is Using Ultimate(Event Player), Or(Is Dead(Event Player), Is Using Ability 1(Event Player))), 1);
+		Press Button(Event Player, Jump);
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("Q")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Ultimate Charge Percent(Event Player) >= 100;
+		Distance Between(Event Player, Closest Player To(Event Player, Team 1)) <= 15;
+		disabled Random Integer(1, 2) == 1;
+	}
+
+	actions
+	{
+		Skip If(Compare(Value In Array(Player Variable(Event Player, V), 4), !=, 1), 1);
+		Press Button(Event Player, Ultimate);
+	}
+}
+
+rule("出生点")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Resurrect(Event Player);
+		Teleport(Event Player, Value In Array(Global Variable(Z), Slot Of(Event Player)));
+	}
+}
+
+rule("站点")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Global Variable(T) == 1;
+		Match Time == 0;
+		Distance Between(Event Player, Vector(-10.000, 2, 0)) > 3;
+	}
+
+	actions
+	{
+		Abort If(Compare(Global Variable(T), ==, 0));
+		Skip If(Compare(Distance Between(Event Player, Vector(-10.000, 2, 0)), <=, 3), 2);
+		Set Player Variable(Event Player, C, 1);
+		Start Throttle In Direction(Event Player, Direction Towards(Eye Position(Event Player), Vector(-10.000, 2, 0)), 1, To World,
+			Replace existing throttle, Direction and Magnitude);
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("站点时间开始")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Match Time >= 1;
+	}
+
+	actions
+	{
+		Set Global Variable(T, 1);
+	}
+}
+
+rule("创建图标")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Custom String("锤", Null, Null, Null), Event Player, 1.800, Do Not Clip,
+			Visible To Position and String, Yellow, Default Visibility);
+		Set Player Variable(Event Player, I, Last Text ID);
+	}
+}
+
+rule("玩家死亡传送")
+{
+	event
+	{
+		Player Died;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Global Variable(D) != 1;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Teleport(Event Player, Vector(10000, 10000, 10000));
+	}
+}
+
+rule("删除位置图标")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Attacker != Event Player;
+	}
+
+	actions
+	{
+		disabled Destroy Icon(Player Variable(Event Player, I));
+		disabled Create Icon(All Players(All Teams), Event Player, Eye, Visible To and Position, Yellow, False);
+		Destroy In-World Text(Player Variable(Event Player, I));
+	}
+}
+
+rule("自动复活带锤")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Attacker == Event Player;
+		Player Variable(Event Player, X) != 1;
+	}
+
+	actions
+	{
+		Set Global Variable(W, 1);
+		Wait(0.500, Ignore Condition);
+		Resurrect(Event Player);
+		Teleport(Event Player, Global Variable(Z));
+		Set Damage Received(Event Player, 100);
+		Wait(0.250, Ignore Condition);
+		Damage(Event Player, Null, Subtract(Max Health(Event Player), Player Variable(Event Player, H)));
+		Wait(0.250, Ignore Condition);
+		Set Damage Received(Event Player, 230);
+		Set Global Variable(W, 0);
+	}
+}
+
+rule("大锤实时血量")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Skip If(Or(Compare(Health(Event Player), ==, 0), Compare(Health(Event Player), ==, Max Health(Event Player))), 1);
+		Set Player Variable(Event Player, H, Health(Event Player));
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("大锤收到伤害")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, Value In Array(Global Variable(V), 102));
+	}
+}
+
+rule("源死完了锤回合胜利")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(V), 10) >= Number of Players(Team 1);
+		Is Game In Progress == True;
+		Global Variable(F) != 1;
+	}
+
+	actions
+	{
+		Declare Round Victory(Team 2);
+		Modify Global Variable(O, Add, 1);
+	}
+}
+
+rule("源胜利")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Number of Living Players(Team 2) == 0;
+		Is Game In Progress == True;
+		Global Variable(F) != 1;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Skip If(Compare(Global Variable(W), ==, 1), 2);
+		Declare Round Victory(Team 1);
+		Modify Global Variable(O, Add, 1);
+	}
+}
+
+rule("每回合结束")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(O) != Global Variable(J);
+	}
+
+	actions
+	{
+		Set Global Variable(T, 0);
+		Set Global Variable At Index(V, 10, 0);
+		Set Player Variable(All Players(Team 2), C, 0);
+		Set Global Variable At Index(V, 30, Empty Array);
+		Set Global Variable At Index(V, 40, 1);
+		Wait(5, Ignore Condition);
+		Set Global Variable At Index(V, 40, 0);
+	}
+}
+
+rule("目标点90开启原生模式")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Point Capture Percentage >= 97;
+	}
+
+	actions
+	{
+		Enable Built-In Game Mode Completion;
+		Set Global Variable(F, 1);
+		Wait(1, Ignore Condition);
+		Disable Built-In Game Mode Completion;
+		Set Global Variable(F, 0);
+		Modify Global Variable(O, Add, 1);
+	}
+}
+
+rule("默认H最大血量")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, H, Max Health(Event Player));
+	}
+}
+
+rule("杀人后1秒内自杀的大锤不复活")
+{
+	event
+	{
+		Player Earned Elimination;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, X, 1);
+		Wait(3, Ignore Condition);
+		Set Player Variable(Event Player, X, 0);
+	}
+}
+
+rule("O Change")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(J, Global Variable(O));
+		Wait(1, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("玩家死亡变量D+1")
+{
+	event
+	{
+		Player Died;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(V), 40) != 1;
+	}
+
+	actions
+	{
+		Modify Global Variable At Index(V, 10, Add, 1);
+		Modify Global Variable At Index(V, 30, Append To Array, Event Player);
+	}
+}
+
+rule("玩家加入死亡")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Modify Global Variable At Index(V, 10, Add, 1);
+	}
+}
+
+rule("目标玩家P")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, O, Closest Player To(Event Player, Team 1));
+		Skip If(Compare(Is In Line of Sight(Eye Position(Event Player), Eye Position(Player Variable(Event Player, O)),
+			All Barriers Block LOS), ==, False), 1);
+		Set Player Variable(Event Player, P, Player Variable(Event Player, O));
+		Skip If(Compare(Is In Line of Sight(Eye Position(Event Player), Eye Position(Player Variable(Event Player, O)),
+			All Barriers Block LOS), ==, True), 1);
+		Set Player Variable(Event Player, P, Player Variable(Event Player, K));
+		Skip If(Compare(Count Of(Filtered Array(All Players(Team 1), Compare(Player Variable(Event Player, P), ==,
+			Current Array Element))), <=, 0), 2);
+		Skip If(Compare(Health(Player Variable(Event Player, P)), <=, 0), 1);
+		Set Player Variable(Event Player, N, 0);
+		Skip If(Or(Compare(Count Of(Filtered Array(All Players(Team 1), Compare(Player Variable(Event Player, P), ==,
+			Current Array Element))), >=, 1), Compare(Health(Player Variable(Event Player, P)), >=, 1)), 1);
+		Set Player Variable(Event Player, N, 1);
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("自定义N")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, K, Filtered Array(Players in View Angle(Event Player, Team 1, 180), Compare(Is In Line of Sight(
+			Eye Position(Event Player), Eye Position(Current Array Element), All Barriers Block LOS), ==, True)));
+		Set Player Variable(Event Player, K, Value In Array(Player Variable(Event Player, K), 0));
+		Wait(0.250, Ignore Condition);
+		Loop;
+	}
+}
+
+rule("中断")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Player Variable(Event Player, N) == 1;
+	}
+
+	actions
+	{
+		Stop Throttle In Direction(Event Player);
+		Stop Facing(Event Player);
+		Set Player Variable At Index(Event Player, V, 0, 0);
+		Set Player Variable At Index(Event Player, V, 1, 0);
+		Set Player Variable At Index(Event Player, V, 2, 0);
+		Set Player Variable At Index(Event Player, V, 3, 0);
+		Set Player Variable At Index(Event Player, V, 4, 0);
+	}
+}
+
+rule("恢复")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Player Variable(Event Player, N) == 0;
+	}
+
+	actions
+	{
+		Set Player Variable At Index(Event Player, V, 0, 1);
+		Set Player Variable At Index(Event Player, V, 1, 1);
+		Set Player Variable At Index(Event Player, V, 2, 1);
+		Set Player Variable At Index(Event Player, V, 3, 1);
+		Set Player Variable At Index(Event Player, V, 4, 1);
+	}
+}
+
+rule("小障碍-区域1")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		True == True;
+	}
+
+	actions
+	{
+		Set Global Variable(B, Empty Array);
+		Set Global Variable(S, Empty Array);
+		Modify Global Variable(B, Append To Array, Vector(-2.315, -10.000, -1.047));
+		Modify Global Variable(S, Append To Array, 10);
+		Modify Global Variable(B, Append To Array, Vector(100, 2.199, 0.576));
+		Modify Global Variable(S, Append To Array, 75);
+		Set Global Variable At Index(V, 99, 100);
+	}
+}
+
+rule("创建小型球形障碍")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		True == True;
+	}
+
+	actions
+	{
+		Create Effect(All Players(All Teams), Sphere, Blue, Value In Array(Global Variable(B), 0), Value In Array(Global Variable(S), 0),
+			Visible To);
+	}
+}
+
+rule("0")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Value In Array(Global Variable(B), 0)) <= Value In Array(Global Variable(S), 0);
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Wait(0.200, Ignore Condition);
+		Abort If(Compare(Distance Between(Position Of(Event Player), Value In Array(Global Variable(B), 0)), ==, Value In Array(
+			Global Variable(S), 0)));
+		Wait(0.010, Ignore Condition);
+		Set Player Variable(Event Player, Q, Direction Towards(Value In Array(Global Variable(B), 0), Position Of(Event Player)));
+		Apply Impulse(Event Player, Player Variable(Event Player, Q), Value In Array(Global Variable(V), 99), To World,
+			Incorporate Contrary Motion);
+		Loop If Condition Is True;
+	}
+}
+
+rule("创建小型球形障碍")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		True == True;
+	}
+
+	actions
+	{
+		Create Effect(All Players(All Teams), Sphere, Blue, Value In Array(Global Variable(B), 1), Value In Array(Global Variable(S), 1),
+			Visible To);
+	}
+}
+
+rule("0")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Value In Array(Global Variable(B), 1)) <= Value In Array(Global Variable(S), 1);
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Wait(0.200, Ignore Condition);
+		Abort If(Compare(Distance Between(Position Of(Event Player), Value In Array(Global Variable(B), 0)), ==, Value In Array(
+			Global Variable(S), 0)));
+		Wait(0.010, Ignore Condition);
+		Set Player Variable(Event Player, Q, Direction Towards(Value In Array(Global Variable(B), 1), Position Of(Event Player)));
+		Apply Impulse(Event Player, Player Variable(Event Player, Q), Value In Array(Global Variable(V), 99), To World,
+			Incorporate Contrary Motion);
+		Loop If Condition Is True;
+	}
+}
+
+rule("每回合终止行为")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global Variable(O) != Global Variable(J);
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Stop Throttle In Direction(Event Player);
+		Set Player Variable(Event Player, N, 1);
+		Wait(0.250, Ignore Condition);
+		Set Player Variable(Event Player, N, 0);
+	}
+}
+
+rule("死亡的玩家退出游戏D-1")
+{
+	event
+	{
+		Player Left Match;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Count Of(Filtered Array(Value In Array(Global Variable(V), 30), Compare(Event Player, ==, Current Array Element))) >= 1;
+	}
+
+	actions
+	{
+		Modify Global Variable At Index(V, 10, Subtract, 1);
+	}
+}
+
+rule("进点")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Global Variable(T) == 1;
+		Match Time == 0;
+		Distance Between(Event Player, Vector(-10.000, 2, 0)) <= 3;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, C, 0);
+		Stop Throttle In Direction(Event Player);
+	}
+}
+
+disabled rule("DEBUG 坐标")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Create In-World Text(All Players(All Teams), Position Of(Event Player), Add(Position Of(Event Player), Vector(0, 12, 0)), 2,
+			Do Not Clip, Visible To Position and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Y Component Of(Position Of(Closest Player To(Event Player, Team 1))), Add(Position Of(
+			Event Player), Vector(0, 8, 0)), 2, Do Not Clip, Visible To Position and String, White, Default Visibility);
+		Create In-World Text(All Players(All Teams), Y Component Of(Position Of(Event Player)), Add(Position Of(Event Player), Vector(0, 4,
+			0)), 2, Do Not Clip, Visible To Position and String, White, Default Visibility);
+	}
+}
+
+disabled rule("DEBUG 每回合结束")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(O) != Global Variable(J);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("回合结束", Null, Null, Null));
+	}
+}
+
+rule("每回合结束")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Global Variable(O) != Global Variable(J);
+	}
+
+	actions
+	{
+		Destroy In-World Text(Player Variable(Event Player, I));
+	}
+}
